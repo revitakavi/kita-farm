@@ -219,8 +219,39 @@ def generate_ai_visuals():
     # Map scenes or fallback
     for idx, scene in enumerate(scenes[:3]):
         desc = scene.get("description", "")
+        
+        # Translate description and topic using local nous-hermes model to get a high quality English prompt
+        translate_prompt = (
+            f"Translate this Thai description of a hydroponic farm scene into a descriptive English image generation prompt. "
+            f"Only output the translated English description, no introduction or other text.\n\n"
+            f"Thai text: \"{topic} - {desc}\""
+        )
+        
+        eng_description = ""
+        try:
+            ollama_url = "http://localhost:11434/api/generate"
+            t_data = {
+                "model": "nous-hermes",
+                "prompt": translate_prompt,
+                "stream": False
+            }
+            req_t = urllib.request.Request(
+                ollama_url,
+                data=json.dumps(t_data).encode("utf-8"),
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req_t, timeout=30) as resp_t:
+                res_t = json.loads(resp_t.read().decode("utf-8"))
+                eng_description = res_t.get("response", "").strip()
+        except Exception as e:
+            print(f"Translation failed: {e}")
+            
+        if not eng_description:
+            # Fallback simple prompt if translation fails
+            eng_description = f"Fresh green salad greens, hydroponic farm greenhouse in Chiang Mai Thailand, morning sun"
+
         # Create a detailed prompt in English
-        eng_prompt = f"Professional photography of {topic}, scene: {desc}. Vibrant hydroponic salad farm greenhouse in Chiang Mai, Thailand, bright morning sunlight, lush green fresh foliage, commercial food styling, depth of field, 9:16 vertical mobile aspect ratio, ultra high quality, clean crisp details"
+        eng_prompt = f"Professional commercial food photography of {eng_description}. Vibrant hydroponic salad farm greenhouse in Chiang Mai, Thailand, bright morning sunlight, lush green fresh foliage, commercial food styling, depth of field, 9:16 vertical mobile aspect ratio, ultra high quality, clean crisp details"
         
         # Pollinations AI image url
         encoded = urllib.parse.quote(eng_prompt)
