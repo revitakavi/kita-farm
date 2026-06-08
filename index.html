@@ -115,9 +115,10 @@
                             <!-- Scenes injected dynamically -->
                         </div>
                         
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button class="btn success" onclick="approveDailyContent()">✅ กิ๊กยอมรับและอนุมัติผลิตคลิปนี้ (Approve & Sync)</button>
                             <button class="btn btn-secondary" onclick="renderApprovedVideo()">🎥 สั่งประกอบ Reels (Fast Build)</button>
+                            <a id="download-reels-btn" href="http://127.0.0.1:8000/api/download/reels" download="daily_reels.mp4" class="btn" style="background: var(--secondary-color); color: var(--background-dark); display: none;">📥 ดาวน์โหลดวิดีโอพร้อมลง 🚀</a>
                         </div>
                     </div>
                 </div>
@@ -125,24 +126,39 @@
                 <div style="display: flex; flex-direction: column; gap: 30px;">
                     <!-- Upload Portal inside Kee Studio -->
                     <div class="card">
-                        <h3 class="section-title">📲 น้องกิ๊กอัปเดตมีเดีย & เสียงพากย์จริง</h3>
+                        <h3 class="section-title">📲 พอร์ทัลส่งงาน & ไฟล์วัตถุดิบ (กิ๊ก)</h3>
                         <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                            น้องกิ๊กสามารถจัดส่งวัตถุดิบถ่ายทำจริง และ 🎙️ <strong>ส่งไฟล์บันทึกเสียงพากย์จริง</strong> (MP3, WAV, M4A) เพื่อประกอบคลิปได้ในบ็อกซ์นี้เลยค่ะ
+                            จัดส่งวัตถุดิบการถ่ายทำและบันทึกเสียงพากย์เพื่อนำมาประกอบร่างเป็นคลิป Reels ประจำวันค่ะ
                         </p>
 
-                        <div class="form-group" style="max-width: 100%;">
+                        <div class="form-group" style="max-width: 100%; margin-bottom: 25px;">
                             <label for="uploader-name">ชื่อผู้จัดส่งมีเดีย:</label>
                             <input type="text" id="uploader-name" class="form-control" value="กิ๊ก (พนักงานแปลงผัก)">
                         </div>
 
-                        <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px; text-align: center; background: rgba(15, 23, 42, 0.3); transition: border-color 0.3s;" ondragover="event.preventDefault()">
-                            <input type="file" id="media-file-input" style="display: none;" onchange="handleFileUpload()">
-                            <button class="btn btn-secondary" onclick="document.getElementById('media-file-input').click()">📁 เลือกไฟล์มีเดีย</button>
-                            <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">
-                                รองรับรูปภาพ (JPG, PNG), คลิปดิบ (MP4) และเสียงพากย์จริง (MP3, M4A, WAV)
-                            </p>
+                        <div class="grid-2col" style="gap: 20px;">
+                            <!-- Column A: Audio Upload -->
+                            <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 25px; text-align: center; background: rgba(15, 23, 42, 0.3);">
+                                <h4 style="color: var(--secondary-color); font-size: 1rem; margin-bottom: 10px;">🎙️ 1. อัปโหลดเสียงพากย์กิ๊ก</h4>
+                                <input type="file" id="audio-file-input" accept="audio/*" style="display: none;" onchange="handleAudioUpload()">
+                                <button class="btn btn-secondary" onclick="document.getElementById('audio-file-input').click()">เลือกไฟล์เสียง 🎙️</button>
+                                <p style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary);">
+                                    รองรับ MP3, M4A, WAV (เสียงพากย์พูดตามบท)
+                                </p>
+                            </div>
+
+                            <!-- Column B: Media Upload -->
+                            <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 25px; text-align: center; background: rgba(15, 23, 42, 0.3);">
+                                <h4 style="color: var(--primary-color); font-size: 1rem; margin-bottom: 10px;">📸 2. อัปโหลดภาพ/คลิปดิบ</h4>
+                                <input type="file" id="media-file-input" accept="image/*,video/*" style="display: none;" onchange="handleMediaUpload()">
+                                <button class="btn btn-secondary" onclick="document.getElementById('media-file-input').click()">เลือกไฟล์ภาพ/คลิป 📸</button>
+                                <p style="margin-top: 10px; font-size: 0.75rem; color: var(--text-secondary);">
+                                    รองรับ JPG, PNG, MP4 (ภาพสวนผัก/กิจกรรม)
+                                </p>
+                            </div>
                         </div>
-                        <div id="upload-status" style="margin-top: 15px; color: var(--primary-color); font-weight: 500; font-size: 0.9rem;"></div>
+
+                        <div id="upload-status" style="margin-top: 20px; color: var(--primary-color); font-weight: 500; font-size: 0.9rem; text-align: center;"></div>
                     </div>
 
                     <!-- Fact check Box -->

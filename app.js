@@ -424,6 +424,12 @@ function fetchTodayContent() {
                     <p style="font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary);">${data.facts}</p>
                     <span class="badge badge-main" style="margin-top: 10px; display: inline-block;">Verified by DeepSeek-R1 (Local Vault)</span>
                 `;
+
+                // Show download button if already approved/rendered
+                if (data.approved) {
+                    const dlBtn = document.getElementById("download-reels-btn");
+                    if (dlBtn) dlBtn.style.display = "inline-flex";
+                }
             }
         })
         .catch(err => console.error("Error fetching today's content:", err));
@@ -482,7 +488,7 @@ function approveDailyContent() {
 
 // Real Video Build via MoviePy FastAPI
 function renderApprovedVideo() {
-    alert("กำลังเรียกใช้งานระบบ MoviePy 2.x บนเครื่องเซิร์ฟเวอร์...\nระบบจะทำการอ่านรูปภาพสุ่มประกอบ สโลว์ภาพ Ken Burns ซ้อนตัวหนังสือหัวข้อ และรวมไฟล์เสียงสังเคราะห์ภาษาไทย\n\nกระบวนการเรนเดอร์อาจใช้เวลาประมาณ 10-30 วินาทีตามสเปกเครื่องคอมพิวเตอร์ค่ะ");
+    alert("กำลังเรียกใช้งานระบบ MoviePy 2.x บนเครื่องเซิร์ฟเวอร์...\nระบบจะทำการอ่านรูปภาพสุ่มประกอบ สโลว์ภาพ Ken Burns ซ้อนตัวหนังสือหัวข้อ และรวมไฟล์เสียงสะท้อนพากย์จริงค่ะ\n\nกระบวนการเรนเดอร์อาจใช้เวลาประมาณ 10-30 วินาทีค่ะ");
     
     fetch(`${API_BASE}/render`, { method: "POST" })
         .then(res => {
@@ -492,21 +498,33 @@ function renderApprovedVideo() {
         .then(data => {
             alert(data.message + "\nไฟล์วิดีโอเซฟอยู่ที่: C:\\KITA FARM\\Projects\\Kitas_Farm\\preview_reels.mp4");
             sendSystemChatMessage("คุณกี้", `ประกอบวิดีโอ Reels ประจำวันสำเร็จแล้วค่ะคุณป๊า! วิดีโอ 15 วินาทีแนวตั้งพร้อมเปิดตรวจและอัปโหลดแล้วค่ะ 🎬🥬`);
+            
+            // Show the download button so Kik can grab it
+            const dlBtn = document.getElementById("download-reels-btn");
+            if (dlBtn) dlBtn.style.display = "inline-flex";
         })
         .catch(err => {
             alert("เรนเดอร์ล้มเหลว: " + err.message);
         });
 }
 
-// Actual File Upload for Kik
-function handleFileUpload() {
-    const input = document.getElementById("media-file-input");
+// Separate upload triggers for Kee's new portal
+function handleAudioUpload() {
+    uploadFile("audio-file-input", true);
+}
+
+function handleMediaUpload() {
+    uploadFile("media-file-input", false);
+}
+
+function uploadFile(inputId, isAudio) {
+    const input = document.getElementById(inputId);
     const status = document.getElementById("upload-status");
     const sender = document.getElementById("uploader-name").value;
 
     if (input.files.length > 0) {
         const file = input.files[0];
-        status.innerText = `⏳ กำลังอัปโหลดไปยังแปลงหลังบ้าน: ${file.name} (ขนาด ${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
+        status.innerText = `⏳ กำลังส่งไฟล์ไปคลังหลังบ้าน: ${file.name} (ขนาด ${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
         
         const formData = new FormData();
         formData.append("file", file);
@@ -519,14 +537,14 @@ function handleFileUpload() {
         .then(res => res.json())
         .then(data => {
             if (data.is_audio) {
-                status.innerText = `🎙️ อัปโหลดเสียงพากย์จริงสำเร็จ! ระบบนำไฟล์เสียงจริงไปตั้งเป็นเสียงพากย์วิดีโอแล้วค่ะ (daily_voice.mp3)`;
+                status.innerText = `🎙️ อัปโหลดไฟล์เสียงพากย์จริงสำเร็จ! กี้ตั้งเป็นเสียงหลักของวิดีโอ Reels เรียบร้อยแล้วนะคะ`;
             } else {
-                status.innerText = `✅ อัปโหลดมีเดียสำเร็จ! ไฟล์ภาพ/คลิป ${data.filename} ถูกส่งเข้าระบบแปลงผักจริงเรียบร้อยแล้วค่ะ`;
+                status.innerText = `📸 อัปโหลดรูปภาพ/คลิปดิบสำเร็จ! ภาพ ${data.filename} ถูกส่งเข้าคลังประกอบคลิปแล้วค่ะ`;
             }
             fetchChats(); // Refresh messages immediately
         })
         .catch(err => {
-            status.innerText = "❌ เกิดข้อผิดพลาดในการอัปโหลดไฟล์";
+            status.innerText = "❌ เกิดข้อผิดพลาดในการอัปโหลดไฟล์ค่ะ";
             console.error("Upload error:", err);
         });
     }
