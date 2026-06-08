@@ -59,8 +59,7 @@ function switchTab(tabId) {
     for (let btn of buttons) {
         if (
             (tabId === 'overview' && btn.innerText.includes('แดชบอร์ด')) ||
-            (tabId === 'content-studio' && btn.innerText.includes('จีจี้')) ||
-            (tabId === 'employee-portal' && btn.innerText.includes('น้องกิ๊ก')) ||
+            (tabId === 'kee-studio' && btn.innerText.includes('คุณกี้')) ||
             (tabId === 'coordination' && btn.innerText.includes('ประสานงาน')) ||
             (tabId === 'calendar' && btn.innerText.includes('ปฏิทิน')) ||
             (tabId === 'inventory' && btn.innerText.includes('ควบคุม')) ||
@@ -336,12 +335,12 @@ const REELS_THEMES = [
     {
         title: "ทำไมกรีนโอ๊คเชียงใหม่ของคีตะฟาร์มถึงหวานกรอบกว่าทั่วไป?",
         factCheck: "🧪 ข้อมูลวิจัย: เนื่องจากคีตะฟาร์มใช้น้ำจากหุบเขาธรรมชาติเชียงใหม่ซึ่งมีแร่ธาตุอุดมสมบูรณ์ และอากาศยามค่ำคืนที่เย็นตัวลง ช่วยเร่งการสะสมน้ำตาลในท่อน้ำเลี้ยง (EC 1.4-1.6 ms/cm) ทำให้ผักไม่ขม ไม่มีปลายใบไหม้ (Tip burn) ปลอดภัย 100%",
-        script: "🎬 [ซีน 1 - หิ้วตะกร้าผักสลัด] (พูดน้ำเสียงร่าเริง)\n\"รู้ไหมคะว่าผักสลัดกรีนโอ๊คที่เชียงใหม่ของเรา...ทำไมถึงเคี้ยวแล้วกร๊อบบ! หวานฉ่ำ ไม่ขมเลย!\"\n\n🎬 [ซีน 2 - แชะกล้องไปที่บ่อปุ๋ยโซน 3]\n\"เคล็ดลับคือ เราคุมบ่อปุ๋ยมาตรฐานแบบเจาะจงโซน 4 โต๊ะต่อ 1 บ่อค่ะ ล็อกค่าปุ๋ยแม่นยำ ผักได้สารอาหารเต็มคำ!\"\n\n🎬 [ซีน 3 - น้องกิ๊กกัดผักโชว์กล้อง]\n\"สดใหม่จากฟาร์มเชียงใหม่ ส่งตรงถึงบ้านทุกสัปดาห์ สนใจผักกล่องสลัดทักแชทจีจี้มาได้เลยนะค๊าา! 🥬✨\""
+        script: "🎬 [ซีน 1 - หิ้วตะกร้าผักสลัด] (พูดน้ำเสียงร่าเริง)\n\"รู้ไหมคะว่าผักสลัดกรีนโอ๊คที่เชียงใหม่ของเรา...ทำไมถึงเคี้ยวแล้วกร๊อบบ! หวานฉ่ำ ไม่ขมเลย!\"\n\n🎬 [ซีน 2 - แชะกล้องไปที่บ่อปุ๋ยโซน 3]\n\"เคล็ดลับคือ เราคุมบ่อปุ๋ยมาตรฐานแบบเจาะจงโซน 4 โต๊ะต่อ 1 บ่อค่ะ ล็อกค่าปุ๋ยแม่นยำ ผักได้สารอาหารเต็มคำ!\"\n\n🎬 [ซีน 3 - น้องกิ๊กกัดผักโชว์กล้อง]\n\"สดใหม่จากฟาร์มเชียงใหม่ ส่งตรงถึงบ้านทุกสัปดาห์ สนใจผักกล่องสลัดทักแชทกี้มาได้เลยนะค๊าา! 🥬✨\""
     },
     {
         title: "ผักไฮโดรฯ ทนร้อนได้จริงไหม? เผยสูตรลับ 'กรีนคอส' โตไวสู้แดด",
         factCheck: "🧪 ข้อมูลวิจัย: กรีนคอสเป็นผักที่ทนอุณหภูมิได้สูงถึง 35-38 องศาเซลเซียส แต่ต้องการการควบคุมออกซิเจนในรากอย่างเสถียร ระบบบ่อปุ๋ยรวมแยก 4 โต๊ะ ช่วยป้องกันการสะสมความร้อนในน้ำปุ๋ยและช่วยเพิ่มอัตราการรอดปลอดภัยเป็น 90%",
-        script: "🎬 [ซีน 1 - เอานิ้วจิ้มน้ำในแปลงปลูก]\n\"แดดเชียงใหม่ร้อนขนาดนี้...แต่ดู 'กรีนคอส' แปลงนี้สิคะ! ใบยังเด้งสู้แดด สดชื่นไม่มีเหี่ยวเลย!\"\n\n🎬 [ซีน 2 - ซูมให้เห็นรากผักสีขาวสะอาด]\n\"เคล็ดลับของคีตะฟาร์มคือ บ่อปุ๋ยแยกช่วยคุมอุณหภูมิรากให้เย็นและมีออกซิเจนไหลเวียนตลอดเวลาค่ะ\"\n\n🎬 [ซีน 3 - โลโก้แบรนด์ Kita's Farm ท้ายคลิป]\n\"อยากทานผักสลัดเกรดพรีเมียม สด สะอาด ปลอดสารเคมี ทักข้อความหาแอดมินจีจี้เพื่อจองสิทธิ์กล่องสลัดสัปดาห์นี้ด่วนเลยค่ะ!\""
+        script: "🎬 [ซีน 1 - เอานิ้วจิ้มน้ำในแปลงปลูก]\n\"แดดเชียงใหม่ร้อนขนาดนี้...แต่ดู 'กรีนคอส' แปลงนี้สิคะ! ใบยังเด้งสู้แดด สดชื่นไม่มีเหี่ยวเลย!\"\n\n🎬 [ซีน 2 - ซูมให้เห็นรากผักสีขาวสะอาด]\n\"เคล็ดลับของคีตะฟาร์มคือ บ่อปุ๋ยแยกช่วยคุมอุณหภูมิรากให้เย็นและมีออกซิเจนไหลเวียนตลอดเวลาค่ะ\"\n\n🎬 [ซีน 3 - โลโก้แบรนด์ Kita's Farm ท้ายคลิป]\n\"อยากทานผักสลัดเกรดพรีเมียม สด สะอาด ปลอดสารเคมี ทักข้อความหาแอดมินกี้เพื่อจองสิทธิ์กล่องสลัดสัปดาห์นี้ด่วนเลยค่ะ!\""
     },
     {
         title: "พาส่องงานย้ายกล้าผัก 14 โซน ปลูกวนรอบทุก 2 วันของคีตะฟาร์ม",
@@ -352,72 +351,220 @@ const REELS_THEMES = [
 
 let currentActiveScriptIndex = 0;
 
-// Random Daily Reels Script and Fact-check Report
-function generateDailyContent() {
-    const randomIndex = Math.floor(Math.random() * REELS_THEMES.length);
-    currentActiveScriptIndex = randomIndex;
-    const theme = REELS_THEMES[randomIndex];
-    
-    // Display Script
+const API_BASE = "http://127.0.0.1:8000/api";
+
+// Fetch chats from FastAPI on page load and then poll periodically
+let polledChats = [];
+function fetchChats() {
+    fetch(`${API_BASE}/chats`)
+        .then(res => res.json())
+        .then(data => {
+            const chatContainer = document.getElementById("chat-messages");
+            if (chatContainer && JSON.stringify(data) !== JSON.stringify(polledChats)) {
+                chatContainer.innerHTML = "";
+                polledChats = data;
+                data.forEach(msg => {
+                    appendMessageHTML(msg.sender, msg.message);
+                });
+            }
+        })
+        .catch(err => console.error("Error fetching chats:", err));
+}
+
+// Render parsed JSON daily brief into UI
+function renderContentBrief(data) {
     const scriptDiv = document.getElementById("reels-script");
-    scriptDiv.innerText = `หัวข้อ: ${theme.title}\n\n${theme.script}`;
+    const hashtagsDiv = document.getElementById("reels-hashtags");
+    const scenesContainer = document.getElementById("reels-scenes-container");
+
+    scriptDiv.innerText = data.script || "";
+    
+    // Render hashtags
+    const hashtags = data.hashtags || [];
+    hashtagsDiv.innerText = hashtags.join(" ");
+
+    // Render shooting scenes list for Kik
+    scenesContainer.innerHTML = "";
+    const scenes = data.shooting_scenes || [];
+    scenes.forEach(scene => {
+        const sceneCard = document.createElement("div");
+        sceneCard.style.background = "rgba(255, 255, 255, 0.03)";
+        sceneCard.style.border = "1px solid rgba(255, 255, 255, 0.08)";
+        sceneCard.style.borderRadius = "6px";
+        sceneCard.style.padding = "10px 14px";
+        sceneCard.style.fontSize = "0.9rem";
+        
+        sceneCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="color: var(--secondary-color);">🎬 ฉากที่ ${scene.scene_no} (${scene.duration || "5 วินาที"})</strong>
+                <span style="color: var(--primary-color); font-weight: 500; font-size: 0.8rem;">[โหมด: ใช้คลิปจริงของกิ๊ก]</span>
+            </div>
+            <p style="margin: 2px 0 6px 0; font-weight: 500;">รายละเอียดฉาก: <span style="color: var(--text-main); font-weight: normal;">${scene.description}</span></p>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+                📸 <strong>วิธีถ่ายทำ:</strong> ${scene.action_instruction}
+            </p>
+        `;
+        scenesContainer.appendChild(sceneCard);
+    });
+
+    document.getElementById("daily-script-container").style.display = "block";
+}
+
+// Fetch today's current script state
+function fetchTodayContent() {
+    fetch(`${API_BASE}/content/today`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.topic && data.script) {
+                renderContentBrief(data);
+
+                const factCheckDiv = document.getElementById("fact-check-box");
+                factCheckDiv.innerHTML = `
+                    <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📋 ผลการวิเคราะห์ข้อมูลความจริง:</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary);">${data.facts}</p>
+                    <span class="badge badge-main" style="margin-top: 10px; display: inline-block;">Verified by DeepSeek-R1 (Local Vault)</span>
+                `;
+            }
+        })
+        .catch(err => console.error("Error fetching today's content:", err));
+}
+
+// Initialize chat fetch and setup polling
+document.addEventListener("DOMContentLoaded", () => {
+    fetchChats();
+    fetchTodayContent();
+    setInterval(fetchChats, 4000); // Poll chats every 4 seconds
+});
+
+// Random Daily Reels Script and Fact-check Report via Backend FastAPI
+function generateDailyContent() {
+    const scriptDiv = document.getElementById("reels-script");
+    const factCheckDiv = document.getElementById("fact-check-box");
+    const scenesContainer = document.getElementById("reels-scenes-container");
+    
+    scriptDiv.innerText = "⏳ กำลังเรียกใช้โมเดล AI ในเครื่อง (DeepSeek-R1) เพื่อสุ่มหัวข้อ วิเคราะห์ข้อมูลจริง และร่างสคริปต์ภาษาไทย... กรุณารอสักครู่ (อาจใช้เวลา 10-30 วินาที)";
+    scenesContainer.innerHTML = "";
     document.getElementById("daily-script-container").style.display = "block";
     
-    // Display Fact Check
-    const factCheckDiv = document.getElementById("fact-check-box");
-    factCheckDiv.innerHTML = `
-        <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📋 ผลการวิเคราะห์ข้อมูลความจริง:</h4>
-        <p style="font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary);">${theme.factCheck}</p>
-        <span class="badge badge-main" style="margin-top: 10px; display: inline-block;">Verified by DeepSeek-R1</span>
-    `;
+    factCheckDiv.innerHTML = `<h4 style="color: var(--secondary-color); margin-bottom: 10px;">📋 กำลังประมวลผล RAG...</h4><p style="color: var(--text-secondary);">อ่านคู่มือการปลูกพืชและ fact-checking ความถูกต้องทางชีววิทยา...</p>`;
+
+    fetch(`${API_BASE}/content/generate`, { method: "POST" })
+        .then(res => {
+            if (!res.ok) throw new Error("เกิดข้อผิดพลาดในการประมวลผล AI หลังบ้าน");
+            return res.json();
+        })
+        .then(data => {
+            renderContentBrief(data);
+            
+            factCheckDiv.innerHTML = `
+                <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📋 ผลการวิเคราะห์ข้อมูลความจริง:</h4>
+                <p style="font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary);">${data.facts}</p>
+                <span class="badge badge-main" style="margin-top: 10px; display: inline-block;">Verified by DeepSeek-R1 (Local Vault)</span>
+            `;
+        })
+        .catch(err => {
+            alert(err.message);
+            scriptDiv.innerText = "การสร้างสคริปต์ล้มเหลว กรุณาตรวจสอบว่าบอร์ด Ollama รันอยู่หรือไม่";
+        });
 }
 
 // Approve script
 function approveDailyContent() {
-    alert("อนุมัติสคริปต์เรียบร้อย! ส่งตารางเข้าท่อการผลิดภาพดิบวิดีโอแล้ว");
-    addCoordinationMessage("คุณพ่อเลี้ยง", `อนุมัติสคริปต์หัวข้อ "${REELS_THEMES[currentActiveScriptIndex].title}" เรียบร้อยแล้วนะจีจี้ ผลิตต่อได้เลย!`);
+    fetch(`${API_BASE}/content/approve`, { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            alert(`อนุมัติสคริปต์เรียบร้อย! เสียงอ่านภาษาไทยและวิดีโอสตอรี่บอร์ดได้รับการอนุมัติแล้วครับ`);
+            // Post a chat message about approval
+            sendSystemChatMessage("กิ๊ก (พนักงานแปลงผัก)", `รับทราบและยอมรับใบสั่งงานแล้วค่ะ! กิ๊กกำลังไปเริ่มถ่ายทำ ${data.data.shooting_scenes.length} ซีนตามที่พี่กี้บอก เดี๋ยวจะอัปรูปกลับขึ้นระบบน๊า 📸🥬`);
+        })
+        .catch(err => console.error("Error approving:", err));
 }
 
-// Simulated Video Build
+// Real Video Build via MoviePy FastAPI
 function renderApprovedVideo() {
-    alert("กำลังเรียกใช้ Higgsfield / Remotion Engine เพื่อวาดเฟรมวิดีโอ...\nสคริปต์นี้จะใช้พรีเซนเตอร์คีตะฟาร์ม [Soul ID: KitaPresenter]");
-    setTimeout(() => {
-        alert("ประกอบวิดีโอเสร็จสมบูรณ์! ได้ไฟล์คลิปสั้น Reels สำหรับวันนี้แล้ว\n(เซฟลงโฟลเดอร์ /Raw/ เพื่อตรวจเตรียมโพสต์)");
-        addCoordinationMessage("จีจี้", `ประกอบวิดีโอ Reels สำหรับหัวข้อวันนี้เสร็จแล้วค่ะคุณป๊า! คลิปสั้นอยู่ในระบบคลังรอโพสต์เย็นนี้ค่ะ 🎬🥬`);
-    }, 1500);
+    alert("กำลังเรียกใช้งานระบบ MoviePy 2.x บนเครื่องเซิร์ฟเวอร์...\nระบบจะทำการอ่านรูปภาพสุ่มประกอบ สโลว์ภาพ Ken Burns ซ้อนตัวหนังสือหัวข้อ และรวมไฟล์เสียงสังเคราะห์ภาษาไทย\n\nกระบวนการเรนเดอร์อาจใช้เวลาประมาณ 10-30 วินาทีตามสเปกเครื่องคอมพิวเตอร์ค่ะ");
+    
+    fetch(`${API_BASE}/render`, { method: "POST" })
+        .then(res => {
+            if (!res.ok) throw new Error("เรนเดอร์ไม่สำเร็จ อาจไม่มีรูปภาพในโฟลเดอร์ หรือติดปัญหาไลบรารี");
+            return res.json();
+        })
+        .then(data => {
+            alert(data.message + "\nไฟล์วิดีโอเซฟอยู่ที่: C:\\KITA FARM\\Projects\\Kitas_Farm\\preview_reels.mp4");
+            sendSystemChatMessage("คุณกี้", `ประกอบวิดีโอ Reels ประจำวันสำเร็จแล้วค่ะคุณป๊า! วิดีโอ 15 วินาทีแนวตั้งพร้อมเปิดตรวจและอัปโหลดแล้วค่ะ 🎬🥬`);
+        })
+        .catch(err => {
+            alert("เรนเดอร์ล้มเหลว: " + err.message);
+        });
 }
 
-// Simulated File Upload for Kik
+// Actual File Upload for Kik
 function handleFileUpload() {
     const input = document.getElementById("media-file-input");
     const status = document.getElementById("upload-status");
+    const sender = document.getElementById("uploader-name").value;
+
     if (input.files.length > 0) {
         const file = input.files[0];
-        status.innerText = `⏳ กำลังอัปโหลด: ${file.name} (ขนาด ${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
+        status.innerText = `⏳ กำลังอัปโหลดไปยังแปลงหลังบ้าน: ${file.name} (ขนาด ${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
         
-        setTimeout(() => {
-            status.innerText = `✅ อัปโหลดสำเร็จ! ไฟล์ ${file.name} ถูกย้ายไปยังโฟลเดอร์ /Raw/ เรียบร้อยแล้ว (จีจี้พร้อมนำไปประกอบสคริปต์แล้ว)`;
-            addCoordinationMessage("กิ๊ก (พนักงานแปลงผัก)", `ส่งภาพถ่ายยอดผักจากโซนที่คิวตัดวันนี้เข้าห้องระบบดิบแล้วค่ะพี่กร พี่จีจี้ เอาไปลงคลิปได้เลยน๊า 📸🥬`);
-        }, 1200);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("sender", sender);
+
+        fetch(`${API_BASE}/upload`, {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.is_audio) {
+                status.innerText = `🎙️ อัปโหลดเสียงพากย์จริงสำเร็จ! ระบบนำไฟล์เสียงจริงไปตั้งเป็นเสียงพากย์วิดีโอแล้วค่ะ (daily_voice.mp3)`;
+            } else {
+                status.innerText = `✅ อัปโหลดมีเดียสำเร็จ! ไฟล์ภาพ/คลิป ${data.filename} ถูกส่งเข้าระบบแปลงผักจริงเรียบร้อยแล้วค่ะ`;
+            }
+            fetchChats(); // Refresh messages immediately
+        })
+        .catch(err => {
+            status.innerText = "❌ เกิดข้อผิดพลาดในการอัปโหลดไฟล์";
+            console.error("Upload error:", err);
+        });
     }
 }
 
-// Coordination Chat Logic
-const INITIAL_MESSAGES = [
-    { sender: "พี่กร", text: "จีจี้ วันนี้ถึงคิวล้างแปลงและตัดผักของโซนที่ 1 (บ่อปุ๋ย 1 - บัตเตอร์เฮด เรดโอ๊ค ฟินเล่) นะ อย่าลืมคุมค่า EC ของโซนนี้ให้อ่อนกว่าปกติด้วยล่ะ" },
-    { sender: "จีจี้", text: "รับทราบค่ะพี่กร! เดี๋ยวจีจี้เตรียมเขียนบท Reels โปรโมทบัตเตอร์เฮดเช้าวันนี้เลย ผักกำลังกรอบได้ที่เลยค่ะ" },
-    { sender: "กิ๊ก (พนักงานแปลงผัก)", text: "ผักโซน 1 ตัดเสร็จเรียบร้อย ชั่งน้ำหนักจริงได้ 42.5 กิโลกรัม ส่งเข้าตาราง Sheets และส่งรูปเข้าแอปแล้วนะคะ" }
-];
-
-// Load initial chat messages
-document.addEventListener("DOMContentLoaded", () => {
-    const chatContainer = document.getElementById("chat-messages");
-    if (chatContainer) {
-        INITIAL_MESSAGES.forEach(msg => {
-            appendMessageHTML(msg.sender, msg.text);
-        });
+// Helper for sending messages to FastAPI
+function sendChatMessage() {
+    const input = document.getElementById("chat-input");
+    const sender = document.getElementById("chat-sender").value;
+    const text = input.value.trim();
+    
+    if (text) {
+        fetch(`${API_BASE}/chats`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sender: sender, message: text })
+        })
+        .then(res => res.json())
+        .then(() => {
+            input.value = "";
+            fetchChats();
+        })
+        .catch(err => console.error("Error sending chat:", err));
     }
-});
+}
+
+function sendSystemChatMessage(sender, text) {
+    fetch(`${API_BASE}/chats`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: sender, message: text })
+    })
+    .then(res => res.json())
+    .then(() => {
+        fetchChats();
+    })
+    .catch(err => console.error("Error sending system chat:", err));
+}
 
 function appendMessageHTML(sender, text) {
     const chatContainer = document.getElementById("chat-messages");
@@ -429,7 +576,7 @@ function appendMessageHTML(sender, text) {
     messageDiv.style.borderRadius = "8px";
     messageDiv.style.maxWidth = "80%";
     
-    if (sender === "จีจี้") {
+    if (sender === "คุณกี้" || sender === "จีจี้") {
         messageDiv.style.alignSelf = "flex-start";
         messageDiv.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
         messageDiv.style.border = "1px solid rgba(16, 185, 129, 0.3)";
@@ -437,7 +584,7 @@ function appendMessageHTML(sender, text) {
         messageDiv.style.alignSelf = "flex-end";
         messageDiv.style.backgroundColor = "rgba(59, 130, 246, 0.15)";
         messageDiv.style.border = "1px solid rgba(59, 130, 246, 0.3)";
-    } else if (sender.includes("คุณพ่อเลี้ยง")) {
+    } else if (sender.includes("คุณพ่อเลี้ยง") || sender.includes("ระบบ")) {
         messageDiv.style.alignSelf = "center";
         messageDiv.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
         messageDiv.style.border = "1px solid rgba(245, 158, 11, 0.3)";
@@ -455,17 +602,6 @@ function appendMessageHTML(sender, text) {
     
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-function sendChatMessage() {
-    const input = document.getElementById("chat-input");
-    const sender = document.getElementById("chat-sender").value;
-    const text = input.value.trim();
-    
-    if (text) {
-        appendMessageHTML(sender, text);
-        input.value = "";
-    }
 }
 
 function addCoordinationMessage(sender, text) {

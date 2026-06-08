@@ -23,8 +23,7 @@
         <!-- Navigation Tabs -->
         <nav class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('overview')">📊 แดชบอร์ดสรุปผล</button>
-            <button class="tab-btn" onclick="switchTab('content-studio')">🎬 สตูดิโอจีจี้ (คอนเทนต์)</button>
-            <button class="tab-btn" onclick="switchTab('employee-portal')">📲 น้องกิ๊กอัปเดตมีเดีย</button>
+            <button class="tab-btn" onclick="switchTab('kee-studio')">🎨 สตูดิโอครีเอทีฟคุณกี้</button>
             <button class="tab-btn" onclick="switchTab('coordination')">💬 ห้องประสานงานหลังบ้าน</button>
             <button class="tab-btn" onclick="switchTab('calendar')">📅 ปฏิทินหมุนเวียนการปลูก</button>
             <button class="tab-btn" onclick="switchTab('inventory')">🌱 ควบคุมเมล็ดพันธุ์ & โซน</button>
@@ -93,69 +92,78 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Tab: Jeejee Content Studio -->
-        <div id="content-studio" class="tab-content">
+        <!-- Tab: Kee Creative Studio -->
+        <div id="kee-studio" class="tab-content">
             <div class="grid-2col">
                 <div class="card">
-                    <h3 class="section-title">🎬 จีจี้ คอนเทนต์สตูดิโอ (Reels Loop)</h3>
+                    <h3 class="section-title">🎨 สตูดิโอครีเอทีฟคุณกี้ (Kee Creative Loop)</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                        ระบบตรวจสอบข้อมูลข้อเท็จจริง (Fact-checking) จาก DeepSeek-R1 ร่วมกับการคิดไอเดียและเขียนบทพากย์วิดีโอสั้น Reels อัตโนมัติทุกวัน
+                        กี้ทำหน้าที่วิเคราะห์ข้อมูลสต็อกผักร่วมกับพี่กร วิจัยความรู้จริงเรื่องผักไฮโดรโปนิกส์ และวางสคริปต์สั้นพร้อมใบสั่งงานถ่ายทำ (Shooting Brief) เพื่อให้น้องกิ๊กนำไปผลิตจริงได้ทันรอบค่ะ
                     </p>
                     
                     <button class="btn" onclick="generateDailyContent()">🤖 สุ่มและผลิตสคริปต์วันนี้</button>
                     
                     <div id="daily-script-container" style="margin-top: 25px; display: none;">
-                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">📋 สคริปต์พากย์ของจีจี้ประจำวัน:</h4>
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">📋 สคริปต์พากย์ของกี้ประจำวัน:</h4>
                         <div id="reels-script" style="background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); white-space: pre-wrap; font-size: 0.95rem; margin-bottom: 15px;"></div>
                         
+                        <h4 style="color: var(--secondary-color); margin-bottom: 5px;">🏷️ แฮชแท็กแนะนำ:</h4>
+                        <div id="reels-hashtags" style="margin-bottom: 15px; color: var(--text-secondary); font-size: 0.9rem;"></div>
+                        
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">🎥 ใบสั่งฉากถ่ายภาพและวิดีโอ (Shooting Brief สำหรับน้องกิ๊ก):</h4>
+                        <div id="reels-scenes-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                            <!-- Scenes injected dynamically -->
+                        </div>
+                        
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn success" onclick="approveDailyContent()">✅ อนุมัติสคริปต์นี้ (Approve)</button>
+                            <button class="btn success" onclick="approveDailyContent()">✅ กิ๊กยอมรับและอนุมัติผลิตคลิปนี้ (Approve & Sync)</button>
                             <button class="btn btn-secondary" onclick="renderApprovedVideo()">🎥 สั่งประกอบ Reels (Fast Build)</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h3 class="section-title">🛡️ รายงานผลการ Fact-Check จาก AI</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                        จีจี้จะกรองข่าวโคมลอยหรือข้อมูลอ้างอิงที่ไม่จริง เพื่อความน่าเชื่อถือระดับห้าดาวของคีตะฟาร์ม
-                    </p>
-                    
-                    <div id="fact-check-box" style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem;">
-                        ยังไม่มีรายงานวิจัย คลิกปุ่ม "สุ่มและผลิตสคริปต์วันนี้" เพื่อเริ่มทำงาน
+                <div style="display: flex; flex-direction: column; gap: 30px;">
+                    <!-- Upload Portal inside Kee Studio -->
+                    <div class="card">
+                        <h3 class="section-title">📲 น้องกิ๊กอัปเดตมีเดีย & เสียงพากย์จริง</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                            น้องกิ๊กสามารถจัดส่งวัตถุดิบถ่ายทำจริง และ 🎙️ <strong>ส่งไฟล์บันทึกเสียงพากย์จริง</strong> (MP3, WAV, M4A) เพื่อประกอบคลิปได้ในบ็อกซ์นี้เลยค่ะ
+                        </p>
+
+                        <div class="form-group" style="max-width: 100%;">
+                            <label for="uploader-name">ชื่อผู้จัดส่งมีเดีย:</label>
+                            <input type="text" id="uploader-name" class="form-control" value="กิ๊ก (พนักงานแปลงผัก)">
+                        </div>
+
+                        <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px; text-align: center; background: rgba(15, 23, 42, 0.3); transition: border-color 0.3s;" ondragover="event.preventDefault()">
+                            <input type="file" id="media-file-input" style="display: none;" onchange="handleFileUpload()">
+                            <button class="btn btn-secondary" onclick="document.getElementById('media-file-input').click()">📁 เลือกไฟล์มีเดีย</button>
+                            <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">
+                                รองรับรูปภาพ (JPG, PNG), คลิปดิบ (MP4) และเสียงพากย์จริง (MP3, M4A, WAV)
+                            </p>
+                        </div>
+                        <div id="upload-status" style="margin-top: 15px; color: var(--primary-color); font-weight: 500; font-size: 0.9rem;"></div>
+                    </div>
+
+                    <!-- Fact check Box -->
+                    <div class="card">
+                        <h3 class="section-title">🛡️ รายงานผลการ Fact-Check จาก AI</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                            รายงานข้อมูลความจริงตามคู่มือ GEGE HYDROPONIC ตรวจสอบความถูกต้องก่อนส่งต่อสคริปต์พากย์
+                        </p>
+                        
+                        <div id="fact-check-box" style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+                            ยังไม่มีรายงานวิจัย คลิกปุ่ม "สุ่มและผลิตสคริปต์วันนี้" เพื่อเริ่มทำงาน
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Tab: Employee Portal -->
-        <div id="employee-portal" class="tab-content">
-            <div class="card">
-                <h3 class="section-title">📲 น้องกิ๊กอัปเดตมีเดีย (หน้าส่งวัตถุดิบและรูปถ่ายฟาร์ม)</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                    พนักงานฟาร์ม (น้องกิ๊ก / น้องบัติ) สามารถถ่ายรูปผักสลัดสวยๆ จากมือถือหรือแปลงผักจริง แล้วลากวางส่งที่นี่เพื่อป้อนให้จีจี้ประกอบคลิปได้ทันที
-                </p>
-
-                <div class="form-group" style="max-width: 400px;">
-                    <label for="uploader-name">ชื่อผู้จัดส่งมีเดีย:</label>
-                    <input type="text" id="uploader-name" class="form-control" value="กิ๊ก (พนักงานแปลงผัก)">
-                </div>
-
-                <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; background: rgba(15, 23, 42, 0.3);">
-                    <input type="file" id="media-file-input" style="display: none;" onchange="handleFileUpload()">
-                    <button class="btn btn-secondary" onclick="document.getElementById('media-file-input').click()">📁 เลือกรูปภาพ / วิดีโอ</button>
-                    <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">รองรับ JPG, PNG, MP4 สูงสุด 50MB (ไฟล์จะถูกเซฟเข้าโฟลเดอร์ Raw อัตโนมัติ)</p>
-                </div>
-                <div id="upload-status" style="margin-top: 15px; color: var(--primary-color); font-weight: 500;"></div>
             </div>
         </div>
 
         <!-- Tab: Backoffice Coordination -->
         <div id="coordination" class="tab-content">
             <div class="card">
-                <h3 class="section-title">💬 ห้องประสานงานอัจฉริยะ (จีจี้ 🤝 พี่กร)</h3>
+                <h3 class="section-title">💬 ห้องประสานงานอัจฉริยะ (คุณกี้ 🤝 พี่กร)</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 20px;">
                     บันทึกบทสนทนาประสานงานระบบผลิตหลังแปลงผักและการดันคอนเทนต์ขายผักสดให้ทันตามวันเก็บเกี่ยว
                 </p>
@@ -166,7 +174,7 @@
 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <select id="chat-sender" class="form-control" style="max-width: 150px;">
-                        <option value="จีจี้">👩‍🌾 จีจี้</option>
+                        <option value="คุณกี้">🎨 คุณกี้</option>
                         <option value="พี่กร">🤖 พี่กร</option>
                         <option value="คุณพ่อเลี้ยง">👨‍💼 คุณพ่อเลี้ยง</option>
                     </select>
