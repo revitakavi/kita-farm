@@ -282,8 +282,7 @@ def generate_ai_visuals():
         
         # Pollinations AI image url
         encoded = urllib.parse.quote(eng_prompt)
-        seed = random.randint(1, 100000)
-        url = f"https://image.pollinations.ai/p/{encoded}?width=1080&height=1920&nologo=true&seed={seed}"
+        url = f"https://image.pollinations.ai/prompt/{encoded}"
         
         target_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
         print(f"Downloading AI Image for Scene {idx+1}: {url}")
@@ -292,7 +291,7 @@ def generate_ai_visuals():
                 url,
                 headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             )
-            with urllib.request.urlopen(req, timeout=15) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, timeout=20) as response, open(target_path, "wb") as out_file:
                 out_file.write(response.read())
             
             # Verify file size to check if it's a valid download and not a failed placeholder
@@ -318,17 +317,20 @@ def generate_ai_visuals():
                 
             flickr_url = f"https://loremflickr.com/1080/1920/{tags}/all?lock={idx+1}"
             try:
+                time.sleep(1.0) # Small sleep delay to prevent concurrent lockups/rate-limiting
                 req = urllib.request.Request(
                     flickr_url,
                     headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
                 )
-                with urllib.request.urlopen(req, timeout=15) as response, open(target_path, "wb") as out_file:
+                with urllib.request.urlopen(req, timeout=20) as response, open(target_path, "wb") as out_file:
                     out_file.write(response.read())
                 if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
                     downloaded += 1
                     print(f"Successfully downloaded LoremFlickr scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
             except Exception as fe:
                 print(f"LoremFlickr download failed for Scene {idx+1}: {fe}")
+        
+        time.sleep(1.0) # Small sleep delay at end of loop iteration
 
     # If both failed, copy from fallback facebook images as absolute last resort
     if downloaded < 3:
