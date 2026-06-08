@@ -448,3 +448,82 @@ input[type=range]::-webkit-slider-thumb:hover {
 .btn.success:hover {
     background: #059669;
 }
+
+/* Mobile Portrait Optimization (Max-width: 600px) */
+@media (max-width: 600px) {
+    body {
+        padding: 10px 5px;
+    }
+    
+    .app-container {
+        padding: 15px 10px;
+        border-radius: 16px;
+        gap: 15px;
+    }
+    
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding-bottom: 12px;
+    }
+    
+    #system-time {
+        text-align: left;
+        font-size: 0.8rem;
+    }
+    
+    .nav-tabs {
+        gap: 5px;
+        padding: 4px;
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+        gap: 4px;
+    }
+    
+    .stat-val {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+    
+    th, td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .exporter-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
