@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KITA FARM - Backend & Crop Control Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header>
+            <div class="logo-section">
+                <h1>🥬 KITA <span>FARM</span></h1>
+                <p>ระบบควบคุมการผลิต วางตารางหมุนเวียน และวิเคราะห์การขายแบบไฮบริด</p>
+            </div>
+            <div id="system-time" style="font-size: 0.9rem; color: var(--text-secondary); text-align: right;">
+                <p>เขตเวลา: GMT+7 (เชียงใหม่)</p>
+                <strong id="live-date">8 มิถุนายน 2026</strong>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">📊 แดชบอร์ดสรุปผล</button>
+            <button class="tab-btn" onclick="switchTab('content-studio')">🎬 สตูดิโอจีจี้ (คอนเทนต์)</button>
+            <button class="tab-btn" onclick="switchTab('employee-portal')">📲 น้องกิ๊กอัปเดตมีเดีย</button>
+            <button class="tab-btn" onclick="switchTab('coordination')">💬 ห้องประสานงานหลังบ้าน</button>
+            <button class="tab-btn" onclick="switchTab('calendar')">📅 ปฏิทินหมุนเวียนการปลูก</button>
+            <button class="tab-btn" onclick="switchTab('inventory')">🌱 ควบคุมเมล็ดพันธุ์ & โซน</button>
+            <button class="tab-btn" onclick="switchTab('sales')">💰 เครื่องมือจำลองการขาย</button>
+            <button class="tab-btn" onclick="switchTab('guide')">📋 โครงสร้าง Google Sheets</button>
+        </nav>
+
+        <!-- Tab 1: Overview Dashboard -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">หลุมปลูกใหญ่ทั้งหมด (ปัจจุบัน)</span>
+                    <span class="stat-val">5,520 หลุม</span>
+                    <span class="stat-desc">โรงเรือน 1: 24 โต๊ะ | (โรงเรือน 2 อีก 18 โต๊ะ ยังไม่ขยาย)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">กำลังการผลิตรายรอบ</span>
+                    <span class="stat-val">394 ต้น / ล็อต</span>
+                    <span class="stat-desc">หมุนเวียนเก็บผักทุก 2 วัน (14 โซน)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">ผลผลิตขายได้สุทธิ</span>
+                    <span class="stat-val">5,322 ต้น / เดือน</span>
+                    <span class="stat-desc">คิดอัตราการรอดปลอดภัย 90%</span>
+                </div>
+                <div class="stat-card warning" id="kpi-profit-card">
+                    <span class="stat-label">ประมาณการกำไรสุทธิ</span>
+                    <span class="stat-val" id="kpi-profit">฿0 / เดือน</span>
+                    <span class="stat-desc" id="kpi-profit-desc">อิงราคาขายส่งเฉลี่ย 65 บ./กก. (ผัก 1 ขีด)</span>
+                </div>
+            </div>
+
+            <div class="grid-2col">
+                <div class="card">
+                    <h3 class="section-title">📊 สรุปโครงสร้างระบบและบ่อปุ๋ย</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <p><strong>ระบบการจ่ายปุ๋ย:</strong> ใช้ระบบ 4 โต๊ะ ต่อ 1 บ่อปุ๋ยหลัก เพื่อให้สามารถแยกการคุมค่า EC/pH ตามกลุ่มสายพันธุ์ผักที่ต้องการต่างกันได้สำเร็จ (รวมทั้งหมด 6 บ่อปุ๋ยสำหรับ 24 โต๊ะ)</p>
+                        
+                        <div class="card" style="background: rgba(15, 23, 42, 0.4); border-color: rgba(255, 255, 255, 0.05); margin-top: 10px;">
+                            <h4 style="color: var(--secondary-color); margin-bottom: 10px;">🧪 กลุ่มที่ 1: ผักน้ำหนักน้อย (บ่อปุ๋ยเฉพาะ)</h4>
+                            <p><strong>สัดส่วนพื้นที่:</strong> 4 โต๊ะ (1 บ่อปุ๋ย) - 920 หลุม</p>
+                            <p><strong>สายพันธุ์:</strong> บัตเตอร์เฮด, เรดโอ๊ค, ฟินเล่</p>
+                            <p><strong>การคุมปุ๋ย:</strong> ใช้ค่า EC อ่อนกว่าเพื่อป้องกันปลายใบไหม้ (Tip Burn)</p>
+                        </div>
+
+                        <div class="card" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); margin-top: 10px;">
+                            <h4 style="color: var(--primary-color); margin-bottom: 10px;">🥬 กลุ่มที่ 2: ผักหลักทนร้อน (บ่อปุ๋ยมาตรฐาน)</h4>
+                            <p><strong>สัดส่วนพื้นที่:</strong> 20 โต๊ะ (5 บ่อปุ๋ย) - 4,600 หลุม</p>
+                            <p><strong>สายพันธุ์:</strong> กรีนโอ๊ค, กรีนคอส</p>
+                            <p><strong>การคุมปุ๋ย:</strong> ค่าปุ๋ยมาตรฐานเพื่อเร่งและล็อกน้ำหนักที่ 1 ขีด/ต้น</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="section-title">⚠️ สรุปงบการเงินและรอยรั่ว (Yield Loss)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <p><strong>ประวัติขาดทุน พ.ค. (สเกล 24 โต๊ะเดิม):</strong> ขาดทุน 11,068.81 บาท (Yield Loss จากน้ำหนักตกเกณฑ์เหลือ 0.5 ขีด และเคลมของเสียหายหายไปกว่า 33.5%)</p>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color);">
+                        <p><strong>โครงสร้างต้นทุนปัจจุบัน (24 โต๊ะ + คนงาน 2 คน):</strong></p>
+                        <ul>
+                            <li><strong>ต้นทุนคงที่ (Fixed Costs):</strong> 32,824 บาท/เดือน (ค่าแรงพนักงาน 26,000 บาท + ค่าไฟระบบบิลจริงเฉลี่ย 6,824 บาท)</li>
+                            <li><strong>ต้นทุนผันแปร (Variable Costs):</strong> 12 บาท / กิโลกรัม (เมล็ด, ปุ๋ย, ฟองน้ำ, แพ็คเกจจิ้ง)</li>
+                            <li><strong>การพัฒนาในอนาคต:</strong> โรงเรือนที่ 2 (อีก 18 โต๊ะ) ยังไม่ได้ขยาย หากทำการขยายจะปลูกเต็มสเกล 42 โต๊ะ และช่วยดึงต้นทุนเฉลี่ยต่อหน่วยลงอย่างมาก</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Jeejee Content Studio -->
+        <div id="content-studio" class="tab-content">
+            <div class="grid-2col">
+                <div class="card">
+                    <h3 class="section-title">🎬 จีจี้ คอนเทนต์สตูดิโอ (Reels Loop)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        ระบบตรวจสอบข้อมูลข้อเท็จจริง (Fact-checking) จาก DeepSeek-R1 ร่วมกับการคิดไอเดียและเขียนบทพากย์วิดีโอสั้น Reels อัตโนมัติทุกวัน
+                    </p>
+                    
+                    <button class="btn" onclick="generateDailyContent()">🤖 สุ่มและผลิตสคริปต์วันนี้</button>
+                    
+                    <div id="daily-script-container" style="margin-top: 25px; display: none;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">📋 สคริปต์พากย์ของจีจี้ประจำวัน:</h4>
+                        <div id="reels-script" style="background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); white-space: pre-wrap; font-size: 0.95rem; margin-bottom: 15px;"></div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn success" onclick="approveDailyContent()">✅ อนุมัติสคริปต์นี้ (Approve)</button>
+                            <button class="btn btn-secondary" onclick="renderApprovedVideo()">🎥 สั่งประกอบ Reels (Fast Build)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="section-title">🛡️ รายงานผลการ Fact-Check จาก AI</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        จีจี้จะกรองข่าวโคมลอยหรือข้อมูลอ้างอิงที่ไม่จริง เพื่อความน่าเชื่อถือระดับห้าดาวของคีตะฟาร์ม
+                    </p>
+                    
+                    <div id="fact-check-box" style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+                        ยังไม่มีรายงานวิจัย คลิกปุ่ม "สุ่มและผลิตสคริปต์วันนี้" เพื่อเริ่มทำงาน
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Employee Portal -->
+        <div id="employee-portal" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">📲 น้องกิ๊กอัปเดตมีเดีย (หน้าส่งวัตถุดิบและรูปถ่ายฟาร์ม)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    พนักงานฟาร์ม (น้องกิ๊ก / น้องบัติ) สามารถถ่ายรูปผักสลัดสวยๆ จากมือถือหรือแปลงผักจริง แล้วลากวางส่งที่นี่เพื่อป้อนให้จีจี้ประกอบคลิปได้ทันที
+                </p>
+
+                <div class="form-group" style="max-width: 400px;">
+                    <label for="uploader-name">ชื่อผู้จัดส่งมีเดีย:</label>
+                    <input type="text" id="uploader-name" class="form-control" value="กิ๊ก (พนักงานแปลงผัก)">
+                </div>
+
+                <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; background: rgba(15, 23, 42, 0.3);">
+                    <input type="file" id="media-file-input" style="display: none;" onchange="handleFileUpload()">
+                    <button class="btn btn-secondary" onclick="document.getElementById('media-file-input').click()">📁 เลือกรูปภาพ / วิดีโอ</button>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">รองรับ JPG, PNG, MP4 สูงสุด 50MB (ไฟล์จะถูกเซฟเข้าโฟลเดอร์ Raw อัตโนมัติ)</p>
+                </div>
+                <div id="upload-status" style="margin-top: 15px; color: var(--primary-color); font-weight: 500;"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Backoffice Coordination -->
+        <div id="coordination" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">💬 ห้องประสานงานอัจฉริยะ (จีจี้ 🤝 พี่กร)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    บันทึกบทสนทนาประสานงานระบบผลิตหลังแปลงผักและการดันคอนเทนต์ขายผักสดให้ทันตามวันเก็บเกี่ยว
+                </p>
+
+                <div id="chat-messages" style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto; background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <!-- Dynamic chats -->
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <select id="chat-sender" class="form-control" style="max-width: 150px;">
+                        <option value="จีจี้">👩‍🌾 จีจี้</option>
+                        <option value="พี่กร">🤖 พี่กร</option>
+                        <option value="คุณพ่อเลี้ยง">👨‍💼 คุณพ่อเลี้ยง</option>
+                    </select>
+                    <input type="text" id="chat-input" class="form-control" placeholder="พิมพ์ข้อความคุยงาน..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <button class="btn" onclick="sendChatMessage()">ส่งแชท 📤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Crop Calendar -->
+        <div id="calendar" class="tab-content">
+
+            <div class="card">
+                <h3 class="section-title">📅 ตารางปฏิบัติงานพนักงานวนลูป 14 ส่วน (ทุกๆ 2 วัน)</h3>
+                <p style="margin-bottom: 20px; color: var(--text-secondary);">
+                    ระบบจะคำนวณสลับรอบการเพาะย้ายปลูกตามรอบวงจรผัก 42 วัน (เพาะเมล็ดบนฟองน้ำ 14 วัน -> ย้ายลงแปลงปลูกจริง NFT ทันที 28 วัน) โดยมีการแบ่งฟาร์มออกเป็น 14 โซน (โซนละ 1 ถึง 2 โต๊ะ)
+                </p>
+
+                <div class="form-group" style="max-width: 300px;">
+                    <label for="start-date-input">เลือกวันเริ่มต้นรอบจัดตาราง:</label>
+                    <input type="date" id="start-date-input" class="form-control" onchange="generateCalendar()">
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>โซนปฏิบัติงาน</th>
+                                <th>จำนวนหลุมปลูก</th>
+                                <th>งานตัดผักขาย (Harvest)</th>
+                                <th>งานล้างแปลงปลูก (Clean)</th>
+                                <th>งานย้ายกล้าลงรางใหญ่ (Transplant)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-table-body">
+                            <!-- JS Dynamically populates here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="exporter-actions">
+                    <button class="btn" onclick="copyCalendarToTelegram()">📤 ส่งตารางเข้า Telegram</button>
+                    <button class="btn btn-secondary" onclick="copyCalendarToNotion()">📋 คัดลอกสำหรับ Notion</button>
+                </div>
+                <div class="clipboard-area" id="calendar-clipboard-preview">
+                    กดปุ่มด้านบนเพื่อแสดงข้อมูลคัดลอกลงบอร์ด...
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Inventory & Seeds Control -->
+        <div id="inventory" class="tab-content">
+            <div class="grid-2col">
+                <div class="card">
+                    <h3 class="section-title">🌱 คำนวณปริมาณเพาะเมล็ดฟองน้ำแยกตามโซน</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        กรุณาเลือกโซนเพื่อคำนวณเมล็ดพันธุ์ที่ต้องเพาะลงฟองน้ำจริง โดยคำนวณเผื่ออัตราการรอด 90% และมีส่วนเกินไม่เกิน 5% เพื่อรักษาต้นทุนผันแปรให้คงที่
+                    </p>
+
+                    <div class="form-group">
+                        <label for="zone-select">เลือกโซนปลูกหลัก (1 - 14):</label>
+                        <select id="zone-select" class="form-control" onchange="calculateSeeds()">
+                            <!-- Generated in JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="zone-info-card" style="background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;">
+                        <!-- JS injects zone layout here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="section-title">📊 รายละเอียดตัวเลขเป้าหมาย</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;" id="seed-calc-results">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>จำนวนช่องปลูกจริงในโซน:</span>
+                            <strong id="lbl-total-holes">0 หลุม</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>เป้าหมายยอดผักส่งตลาด (90%):</span>
+                            <strong id="lbl-market-yield" style="color: var(--primary-color);">0 ต้น</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>จำนวนเมล็ดพันธุ์ที่ต้องเพาะจริง:</span>
+                            <strong id="lbl-target-seeds" style="color: var(--secondary-color);">0 เมล็ด</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>เป้าหมายน้ำหนักผักคาดหวัง:</span>
+                            <strong id="lbl-expected-weight">0.0 กิโลกรัม</strong>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color);">
+                        
+                        <div class="form-group">
+                            <label for="actual-yield-input">ป้อนยอดน้ำหนักผักที่ตัดจริง (กิโลกรัม) เพื่ออัปเดตระบบ:</label>
+                            <input type="number" id="actual-yield-input" class="form-control" value="71.3" step="0.1" style="max-width: 150px;">
+                        </div>
+
+                        <div class="exporter-actions">
+                            <button class="btn" onclick="copySeedDataToSheets()">📋 คัดลอกไปวาง Google Sheets</button>
+                        </div>
+                        <div class="clipboard-area" id="seed-clipboard-preview">
+                            กดปุ่มด้านบนเพื่อก๊อปปี้ข้อมูลแถวสำหรับ Google Sheets...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Sales Simulator -->
+        <div id="sales" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">💸 โปรแกรมจำลองการขายแบบไฮบริด (Sales Mix Simulator)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    ปรับอัตราส่วนปริมาณผักที่ขายปลีก (กิโลละ 100 บาท) และขายส่ง (กิโลละ 65 บาท) เพื่อวิเคราะห์ยอดขายและกำไรของฟาร์ม 24 โต๊ะ (โรงเรือน 1)
+                </p>
+
+                <div class="grid-2col">
+                    <div style="display: flex; flex-direction: column; gap: 25px;">
+                        <!-- Slider for Retail Ratio -->
+                        <div class="slider-container">
+                            <div class="slider-labels">
+                                <span>สัดส่วนขายส่ง B2B (฿65/กก.)</span>
+                                <span id="lbl-wholesale-ratio">80%</span>
+                            </div>
+                            <input type="range" id="wholesale-ratio-slider" min="0" max="100" value="80" oninput="updateSalesMix()">
+                        </div>
+
+                        <div class="slider-container">
+                            <div class="slider-labels">
+                                <span>สัดส่วนขายปลีก B2C (฿100/กก.)</span>
+                                <span id="lbl-retail-ratio">20%</span>
+                            </div>
+                            <input type="range" id="retail-ratio-slider" min="0" max="100" value="20" disabled style="opacity: 0.5;">
+                            <small style="color: var(--text-secondary); font-style: italic;">*สัดส่วนคำนวณสัมพันธ์กันเต็ม 100% เสมอ</small>
+                        </div>
+
+                        <!-- Slider for Yield Loss -->
+                        <div class="slider-container">
+                            <div class="slider-labels">
+                                <span style="color: var(--danger);">เปอร์เซ็นต์อัตราการเสียหาย (Yield Loss)</span>
+                                <strong id="lbl-yield-loss" style="color: var(--danger);">10%</strong>
+                            </div>
+                            <input type="range" id="yield-loss-slider" min="0" max="50" value="10" oninput="updateSalesMix()">
+                            <small style="color: var(--text-secondary);">*ค่าเริ่มต้นตามเกณฑ์สัดส่วนรอดคือ 10% (ถ้ามีโรคระบาดหรืออากาศร้อนจัด ค่าจะพุ่งขึ้น)</small>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 15px; background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📊 ผลลัพธ์จำลองทางการเงินรายเดือน</h4>
+                        
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>น้ำหนักผักส่งออกตลาดสุทธิ:</span>
+                            <strong id="sim-net-weight">962.0 กก./เดือน</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>ราคาเฉลี่ยรวมปลีกผสมส่ง (Weighted Price):</span>
+                            <strong id="sim-avg-price">฿72.00 / กก.</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>รายรับรวมคาดการณ์:</span>
+                            <strong id="sim-revenue" style="color: var(--primary-color);">฿69,264 / เดือน</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>รายจ่ายรวม (คงที่ 32.8k + ผันแปร):</span>
+                            <strong id="sim-expense">฿0 / เดือน</strong>
+                        </div>
+                        <hr style="border: 0; border-top: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700;">
+                            <span>กำไรสุทธิจำลอง:</span>
+                            <span id="sim-net-profit" style="color: var(--primary-color);">฿9,960 / เดือน</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Google Sheets Guide -->
+        <div id="guide" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">📊 โครงสร้างฐานข้อมูลกลางบน Google Sheets</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    แนะนำให้คุณป๊าทำการสร้างไฟล์ Spreadsheet ใน Google Sheets และจัดทำหัวข้อตาราง (Header Columns) ตามสเปกด้านล่าง เพื่อใช้ป้อนข้อมูลเก็บจริงร่วมกับคนงานครับ
+                </p>
+
+                <div class="grid-2col">
+                    <div>
+                        <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📁 แผ่นงานที่ 1: บันทึกรอบปลูกและ Yield (Crop Logs)</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">เก็บประวัติรอบปลูก วันเพาะ วันตัดผัก และปริมาณน้ำหนักจริง</p>
+                        <table style="font-size: 0.85rem; margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>หัวตาราง (Headers)</th>
+                                    <th>ประเภทข้อมูล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>วันที่บันทึก</td><td>วันที่</td></tr>
+                                <tr><td>รอบโซน (Zone)</td><td>ข้อความ (โซน 1 - 14)</td></tr>
+                                <tr><td>ชนิดผัก</td><td>ข้อความ (กรีนโอ๊ค / กรีนคอส)</td></tr>
+                                <tr><td>จำนวนเมล็ดเพาะ (Seeds)</td><td>จำนวนเต็ม</td></tr>
+                                <tr><td>น้ำหนักผักตัดได้จริง (กก.)</td><td>ตัวเลขทศนิยม</td></tr>
+                                <tr><td>พนักงานผู้บันทึก</td><td>ข้อความ (บัติ / กิ๊ก)</td></tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-secondary" onclick="copyHeaders(1)" style="margin-top: 15px;">📋 คัดลอกหัวตารางแผ่นที่ 1</button>
+                    </div>
+
+                    <div>
+                        <h4 style="color: var(--secondary-color); margin-bottom: 10px;">📁 แผ่นงานที่ 2: บันทึกรายรับรายจ่าย (Financial Logs)</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">ใช้กรอกรายจ่ายคงที่และค่าปุ๋ย/เมล็ดรวมถึงยอดขายเพื่อคุมจุดคุ้มทุน</p>
+                        <table style="font-size: 0.85rem; margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>หัวตาราง (Headers)</th>
+                                    <th>ประเภทข้อมูล</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>วันที่</td><td>วันที่</td></tr>
+                                <tr><td>หมวดหมู่</td><td>ตัวเลือก (ค่าไฟ / ค่าแรง / ปุ๋ย / เมล็ด / ขายปลีก / ขายส่ง)</td></tr>
+                                <tr><td>รายละเอียด</td><td>ข้อความอธิบาย</td></tr>
+                                <tr><td>จำนวนเงิน (บาท)</td><td>ตัวเลขทศนิยม</td></tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-secondary" onclick="copyHeaders(2)" style="margin-top: 15px;">📋 คัดลอกหัวตารางแผ่นที่ 2</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script file link -->
+    <script src="app.js"></script>
+</body>
+</html>
