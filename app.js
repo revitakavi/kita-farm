@@ -425,10 +425,9 @@ function fetchTodayContent() {
                     <span class="badge badge-main" style="margin-top: 10px; display: inline-block;">Verified by DeepSeek-R1 (Local Vault)</span>
                 `;
 
-                // Show download button if already approved/rendered
+                // Show download button and video player if already approved/rendered
                 if (data.approved) {
-                    const dlBtn = document.getElementById("download-reels-btn");
-                    if (dlBtn) dlBtn.style.display = "inline-flex";
+                    updateVideoPreview();
                 }
             }
         })
@@ -500,9 +499,8 @@ function renderApprovedVideo() {
             alert(data.message + "\nไฟล์วิดีโอเซฟอยู่ที่: C:\\KITA FARM\\Projects\\Kitas_Farm\\preview_reels.mp4");
             sendSystemChatMessage("คุณกี้", `ประกอบวิดีโอ Reels ประจำวันสำเร็จแล้วค่ะคุณป๊า! วิดีโอ 15 วินาทีแนวตั้งพร้อมเปิดตรวจและอัปโหลดแล้วค่ะ 🎬🥬`);
             
-            // Show the download button so Kik can grab it
-            const dlBtn = document.getElementById("download-reels-btn");
-            if (dlBtn) dlBtn.style.display = "inline-flex";
+            // Show and reload video player preview
+            updateVideoPreview();
         })
         .catch(err => {
             alert("เรนเดอร์ล้มเหลว: " + err.message);
@@ -521,13 +519,29 @@ function generateAIVisuals() {
         .then(data => {
             alert(data.message + "\nไฟล์วิดีโอเซฟอยู่ที่: C:\\KITA FARM\\Projects\\Kitas_Farm\\preview_reels.mp4");
             
-            // Show the download button so they can grab it
-            const dlBtn = document.getElementById("download-reels-btn");
-            if (dlBtn) dlBtn.style.display = "inline-flex";
+            // Show and reload video player preview
+            updateVideoPreview();
         })
         .catch(err => {
             alert("เกิดข้อผิดพลาด: " + err.message);
         });
+}
+
+function updateVideoPreview() {
+    const previewContainer = document.getElementById("reels-preview-container");
+    const videoPlayer = document.getElementById("reels-video-player");
+    const dlBtn = document.getElementById("download-reels-btn");
+    
+    if (previewContainer && videoPlayer) {
+        // Force reload the video by appending a random query parameter to bypass cache
+        videoPlayer.src = `${API_BASE}/download/reels?t=${new Date().getTime()}`;
+        videoPlayer.load();
+        previewContainer.style.display = "block";
+    }
+    
+    if (dlBtn) {
+        dlBtn.style.display = "inline-flex";
+    }
 }
 
 // Separate upload triggers for Kee's new portal
