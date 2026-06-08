@@ -508,6 +508,27 @@ function renderApprovedVideo() {
         });
 }
 
+// AI Image and Video Generator via Pollinations & MoviePy
+function generateAIVisuals() {
+    alert("กำลังเรียกใช้ AI ในการสร้างรูปภาพตามสตอรี่บอร์ดทั้ง 3 ซีน และนำมารวมเข้ากับเสียงพากย์เพื่อประกอบคลิป Reels วิดีโอค่ะ...\n\nระบบจะใช้เวลาประมาณ 20-40 วินาทีในการเจนรูปภาพและเรนเดอร์วิดีโอค่ะ");
+    
+    fetch(`${API_BASE}/content/generate-visuals`, { method: "POST" })
+        .then(res => {
+            if (!res.ok) throw new Error("การเจนภาพและวิดีโอด้วย AI ล้มเหลวค่ะ");
+            return res.json();
+        })
+        .then(data => {
+            alert(data.message + "\nไฟล์วิดีโอเซฟอยู่ที่: C:\\KITA FARM\\Projects\\Kitas_Farm\\preview_reels.mp4");
+            
+            // Show the download button so they can grab it
+            const dlBtn = document.getElementById("download-reels-btn");
+            if (dlBtn) dlBtn.style.display = "inline-flex";
+        })
+        .catch(err => {
+            alert("เกิดข้อผิดพลาด: " + err.message);
+        });
+}
+
 // Separate upload triggers for Kee's new portal
 function handleAudioUpload() {
     uploadFile("audio-file-input", true);
