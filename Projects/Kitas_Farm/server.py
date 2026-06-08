@@ -292,7 +292,7 @@ def generate_ai_visuals():
                 url,
                 headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             )
-            with urllib.request.urlopen(req, timeout=30) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, timeout=15) as response, open(target_path, "wb") as out_file:
                 out_file.write(response.read())
             
             # Verify file size to check if it's a valid download and not a failed placeholder
@@ -302,9 +302,37 @@ def generate_ai_visuals():
         except Exception as e:
             print(f"Error downloading AI image {idx+1}: {e}")
             
-    # If downloading failed, copy from fallback facebook images
+        # If Pollinations failed/timed-out, use LoremFlickr with category-specific keyword
+        if not os.path.exists(target_path) or os.path.getsize(target_path) < 1000:
+            print(f"Pollinations AI failed for Scene {idx+1}. Trying LoremFlickr fallback...")
+            tags = "hydroponics,salad,greenhouse"
+            topic_lower = topic.lower()
+            if "red" in topic_lower or "เรด" in topic_lower:
+                tags = "red,oak,salad,hydroponics"
+            elif "butter" in topic_lower or "บัตเตอร์" in topic_lower:
+                tags = "butterhead,salad,hydroponics"
+            elif "cos" in topic_lower or "คอส" in topic_lower:
+                tags = "cos,salad,hydroponics"
+            elif "finlay" in topic_lower or "ฟินเล่" in topic_lower:
+                tags = "frillice,salad,hydroponics"
+                
+            flickr_url = f"https://loremflickr.com/1080/1920/{tags}/all?lock={idx+1}"
+            try:
+                req = urllib.request.Request(
+                    flickr_url,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                )
+                with urllib.request.urlopen(req, timeout=15) as response, open(target_path, "wb") as out_file:
+                    out_file.write(response.read())
+                if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
+                    downloaded += 1
+                    print(f"Successfully downloaded LoremFlickr scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
+            except Exception as fe:
+                print(f"LoremFlickr download failed for Scene {idx+1}: {fe}")
+
+    # If both failed, copy from fallback facebook images as absolute last resort
     if downloaded < 3:
-        print(f"Warning: Only {downloaded}/3 AI images downloaded successfully. Filling missing scenes from fallback.")
+        print(f"Warning: Only {downloaded}/3 AI/Flickr images downloaded successfully. Filling missing scenes from facebook fallback.")
         fb_dir = os.path.join(WORKSPACE_ROOT, "Raw", "KitaFarm_Media", "facebook")
         import glob
         fb_images = glob.glob(os.path.join(fb_dir, "**", "*.jpg"), recursive=True)
@@ -315,7 +343,7 @@ def generate_ai_visuals():
                     src = random.choice(fb_images)
                     shutil.copy(src, t_path)
                     downloaded += 1
-                    print(f"Copied fallback image to {t_path}")
+                    print(f"Copied fallback facebook image to {t_path}")
 
     # Now render the video automatically
     import subprocess

@@ -58,10 +58,23 @@ def build_reels_video():
     category = today_content.get("category", "TOURING")
     script_text = today_content.get("script", "")
 
-    # We will generate a 15-second preview (3 images, 5 seconds each) to match short vertical formats
-    target_duration = 15.0
-    img_duration = 5.0
+    # Check if voiceover audio exists to determine video duration
+    audio_path = "Raw/Voice/daily_voice.mp3"
+    has_audio = False
+    target_duration = 15.0 # default duration if no voiceover
+    
+    if os.path.exists(audio_path) and os.path.getsize(audio_path) > 1000:
+        try:
+            audio_test = AudioFileClip(audio_path)
+            target_duration = audio_test.duration
+            audio_test.close()
+            has_audio = True
+            print(f"Found voiceover: {audio_path}. Adjusting video duration to {target_duration}s")
+        except Exception as e:
+            print(f"Failed to check voiceover duration: {e}")
+
     num_images_needed = 3
+    img_duration = target_duration / num_images_needed
     
     # Locate photos based on visual style
     # If farm_footage, we look in uploads directory. If empty, fall back.
@@ -138,17 +151,12 @@ def build_reels_video():
     except Exception as e:
         print(f"TextClip rendering skipped/failed: {e}.")
         
-    # Load audio voice track if approved
+    # Load audio voice track if approved and verified
     audio_path = "Raw/Voice/daily_voice.mp3"
-    if os.path.exists(audio_path):
+    if has_audio and os.path.exists(audio_path):
         try:
             print("Applying Thai voiceover audio track...")
             audio = AudioFileClip(audio_path)
-            if audio.duration > target_duration:
-                audio = audio.subclipped(0, target_duration)
-            else:
-                # Pad/trim
-                pass
             video = video.with_audio(audio)
         except Exception as e:
             print(f"Failed to load/apply voiceover audio: {e}")
