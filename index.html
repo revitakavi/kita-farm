@@ -24,7 +24,6 @@
         <nav class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('overview')">📊 แดชบอร์ดสรุปผล</button>
             <button class="tab-btn" onclick="switchTab('kee-studio')">🎨 สตูดิโอครีเอทีฟคุณกี้</button>
-            <button class="tab-btn" onclick="switchTab('coordination')">💬 ห้องประสานงานหลังบ้าน</button>
             <button class="tab-btn" onclick="switchTab('calendar')">📅 ปฏิทินหมุนเวียนการปลูก</button>
             <button class="tab-btn" onclick="switchTab('inventory')">🌱 ควบคุมเมล็ดพันธุ์ & โซน</button>
             <button class="tab-btn" onclick="switchTab('sales')">💰 เครื่องมือจำลองการขาย</button>
@@ -176,29 +175,7 @@
             </div>
         </div>
 
-        <!-- Tab: Backoffice Coordination -->
-        <div id="coordination" class="tab-content">
-            <div class="card">
-                <h3 class="section-title">💬 ห้องประสานงานอัจฉริยะ (คุณกี้ 🤝 พี่กร)</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                    บันทึกบทสนทนาประสานงานระบบผลิตหลังแปลงผักและการดันคอนเทนต์ขายผักสดให้ทันตามวันเก็บเกี่ยว
-                </p>
 
-                <div id="chat-messages" style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto; background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <!-- Dynamic chats -->
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <select id="chat-sender" class="form-control" style="max-width: 150px;">
-                        <option value="คุณกี้">🎨 คุณกี้</option>
-                        <option value="พี่กร">🤖 พี่กร</option>
-                        <option value="คุณพ่อเลี้ยง">👨‍💼 คุณพ่อเลี้ยง</option>
-                    </select>
-                    <input type="text" id="chat-input" class="form-control" placeholder="พิมพ์ข้อความคุยงาน..." onkeydown="if(event.key==='Enter') sendChatMessage()">
-                    <button class="btn" onclick="sendChatMessage()">ส่งแชท 📤</button>
-                </div>
-            </div>
-        </div>
 
         <!-- Tab 2: Crop Calendar -->
         <div id="calendar" class="tab-content">
