@@ -439,6 +439,7 @@ function fetchTodayContent() {
 document.addEventListener("DOMContentLoaded", () => {
     fetchChats();
     fetchTodayContent();
+    loadFeedbackAnalysis();
     setInterval(fetchChats, 4000); // Poll chats every 4 seconds
 });
 
@@ -645,4 +646,58 @@ function appendMessageHTML(sender, text) {
 
 function addCoordinationMessage(sender, text) {
     appendMessageHTML(sender, text);
+}
+
+// -------------------------------------------------------------
+// Kik Feedback & Hermes AI Audit Integrations
+// -------------------------------------------------------------
+function submitFeedback() {
+    const sender = document.getElementById("feedback-sender").value;
+    const text = document.getElementById("feedback-text").value.trim();
+    if (!text) {
+        alert("กรุณากรอกข้อความฟีดแบ็กก่อนค่ะ");
+        return;
+    }
+    fetch(`${API_BASE}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: sender, feedback_text: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        document.getElementById("feedback-text").value = "";
+        fetchChats(); // Refresh chat immediately
+    })
+    .catch(err => alert("เกิดข้อผิดพลาดในการส่งฟีดแบ็ก: " + err.message));
+}
+
+function analyzeFeedbacks() {
+    const box = document.getElementById("hermes-analysis-box");
+    box.innerText = "⏳ กำลังดึงฟีดแบ็กทั้งหมดและส่งให้ Hermes (Ollama) ทำการสแกนวิเคราะห์ผ่านแบบแผน GAP & Operations... กรุณารอสักครู่ค่ะ (อาจใช้เวลา 10-30 วินาที)";
+    
+    fetch(`${API_BASE}/feedback/analyze`, { method: "POST" })
+    .then(res => {
+        if (!res.ok) throw new Error("การวิเคราะห์ของ Hermes ล้มเหลวค่ะ");
+        return res.json();
+    })
+    .then(data => {
+        box.innerText = data.analysis;
+        fetchChats(); // Refresh chats to show Hermes update
+    })
+    .catch(err => {
+        box.innerText = "❌ เกิดข้อผิดพลาดในการวิเคราะห์: " + err.message;
+    });
+}
+
+function loadFeedbackAnalysis() {
+    fetch(`${API_BASE}/feedback/analysis`)
+    .then(res => res.json())
+    .then(data => {
+        const box = document.getElementById("hermes-analysis-box");
+        if (box && data.analysis) {
+            box.innerText = data.analysis;
+        }
+    })
+    .catch(err => console.error("Error loading feedback analysis:", err));
 }

@@ -37,12 +37,18 @@ WORKSPACE_ROOT = "C:\\KITA FARM"
 MEDIA_DIR = os.path.join(WORKSPACE_ROOT, "Raw", "KitaFarm_Media", "uploads")
 CHATS_FILE = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "agent_chats.json")
 CROP_YIELD_FILE = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "crop_yields.json")
+FEEDBACK_FILE = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "kik_feedbacks.json")
+FEEDBACK_ANALYSIS_FILE = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "hermes_feedback_analysis.md")
 
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
 class ChatMessage(BaseModel):
     sender: str
     message: str
+
+class FeedbackModel(BaseModel):
+    sender: str
+    feedback_text: str
 
 # Seed sample data for chat if not exists
 if not os.path.exists(CHATS_FILE):
@@ -260,6 +266,91 @@ def generate_ai_visuals():
         return {"status": "success", "message": f"เจนภาพ AI สำเร็จ {downloaded} ภาพ และเรนเดอร์วิดีโอเรียบร้อยแล้วค่ะ"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ประกอบคลิปไม่สำเร็จหลังเจนภาพ: {str(e)}")
+
+@app.post("/api/feedback")
+def post_feedback(fb: FeedbackModel):
+    feedbacks = []
+    if os.path.exists(FEEDBACK_FILE):
+        try:
+            with open(FEEDBACK_FILE, "r", encoding="utf-8") as f:
+                feedbacks = json.load(f)
+        except:
+            pass
+    feedbacks.append({
+        "timestamp": time.time(),
+        "sender": fb.sender,
+        "feedback_text": fb.feedback_text
+    })
+    with open(FEEDBACK_FILE, "w", encoding="utf-8") as f:
+        json.dump(feedbacks, f, ensure_ascii=False, indent=2)
+        
+    post_chat(ChatMessage(
+        sender=fb.sender,
+        message=f"📝 ส่งข้อเสนอแนะหน้างาน: \"{fb.feedback_text[:60]}...\" เข้าสู่ระบบหลังบ้านสำเร็จแล้วค่ะ!"
+    ))
+    return {"status": "success", "message": "บันทึกข้อเสนอแนะเรียบร้อยแล้วค่ะ"}
+
+@app.post("/api/feedback/analyze")
+def analyze_feedbacks():
+    if not os.path.exists(FEEDBACK_FILE):
+        return {"analysis": "ยังไม่มีรายงานข้อเสนอแนะจากน้องกิ๊กส่งเข้ามาในระบบค่ะ"}
+        
+    with open(FEEDBACK_FILE, "r", encoding="utf-8") as f:
+        feedbacks = json.load(f)
+        
+    if not feedbacks:
+        return {"analysis": "ยังไม่มีรายงานข้อเสนอแนะจากน้องกิ๊กส่งเข้ามาในระบบค่ะ"}
+        
+    # Format feedback texts for LLM
+    formatted_feedbacks = ""
+    for idx, fb in enumerate(feedbacks):
+        t_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(fb['timestamp']))
+        formatted_feedbacks += f"[{t_str}] จาก {fb['sender']}: {fb['feedback_text']}\n---\n"
+        
+    prompt = (
+        "You are 'Hermes', the backend AI assistant auditor for KITA FARM. "
+        "Analyze these operational feedbacks submitted by the field workers and write a detailed audit summary report in Thai. "
+        "Highlight: \n"
+        "1) App/Technical issues (e.g. video rendering, RAG quality, UI lag)\n"
+        "2) Greenhouse / Hydroponics issues (e.g. water EC level, seeding survival rate, temperature problems)\n"
+        "3) Actionable priorities for Kee to solve the problems.\n\n"
+        "Write in natural and professional Thai. Do not include thinking tags."
+    )
+    
+    ollama_url = "http://localhost:11434/api/generate"
+    data = {
+        "model": "nous-hermes",
+        "prompt": f"{prompt}\n\nFeedbacks list:\n{formatted_feedbacks}",
+        "stream": False
+    }
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            ollama_url,
+            data=json.dumps(data).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=120) as response:
+            res = json.loads(response.read().decode("utf-8"))
+            analysis = res.get("response", "").strip()
+            
+            with open(FEEDBACK_ANALYSIS_FILE, "w", encoding="utf-8") as f_out:
+                f_out.write(analysis)
+                
+            post_chat(ChatMessage(
+                sender="Hermes",
+                message="🔍 วิเคราะห์ฟีดแบ็กจากหน้างานเสร็จเรียบร้อยแล้วครับพี่กี้! สรุปข้อมูลใส่แดชบอร์ดให้แล้วครับ"
+            ))
+            return {"analysis": analysis}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ollama (nous-hermes) Analysis failed: {e}")
+
+@app.get("/api/feedback/analysis")
+def get_feedback_analysis():
+    if os.path.exists(FEEDBACK_ANALYSIS_FILE):
+        with open(FEEDBACK_ANALYSIS_FILE, "r", encoding="utf-8") as f:
+            return {"analysis": f.read()}
+    return {"analysis": "ยังไม่มีรายงานวิเคราะห์ฟีดแบ็กจาก Hermes กดปุ่มวิเคราะห์เพื่ออัปเดตรายงานล่าสุดค่ะ"}
 
 from fastapi.responses import FileResponse
 

@@ -173,6 +173,35 @@
                             ยังไม่มีรายงานวิจัย คลิกปุ่ม "สุ่มและผลิตสคริปต์วันนี้" เพื่อเริ่มทำงาน
                         </div>
                     </div>
+
+                    <!-- Feedback Box from Kik -->
+                    <div class="card">
+                        <h3 class="section-title">📝 กล่องส่งฟีดแบ็กจากหน้างาน (กิ๊กถึงกี้)</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                            น้องกิ๊กสามารถส่งรายงานปัญหา ข้อเสนอแนะ หรือบั๊กที่พบล่าสุดเข้ามาเพื่อให้ระบบหลังบ้านและพี่กี้รับทราบได้เลยค่ะ
+                        </p>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="feedback-sender">ผู้รายงานฟีดแบ็ก:</label>
+                            <input type="text" id="feedback-sender" class="form-control" value="กิ๊ก (พนักงานแปลงผัก)" style="background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="feedback-text">ข้อเสนอแนะ / ปัญหาที่พบ:</label>
+                            <textarea id="feedback-text" class="form-control" rows="3" placeholder="เช่น เจนคลิปไม่เสร็จ, ค่า EC ของบัตเตอร์เฮดแปลกๆ, หน้าจอค้าง..." style="background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; resize: vertical; width: 100%; box-sizing: border-box;"></textarea>
+                        </div>
+                        <button class="btn success" onclick="submitFeedback()">📤 ส่งฟีดแบ็กเข้าสู่ระบบ</button>
+                    </div>
+
+                    <!-- Hermes Feedback Analyzer Report -->
+                    <div class="card">
+                        <h3 class="section-title">🤖 รายงานวิเคราะห์ฟีดแบ็กโดย Hermes AI</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                            ดึงข้อมูลปัญหาสะสมทั้งหมด และให้บอต Hermes (Ollama) ทำการสแกน จัดกลุ่มประเภท และวิเคราะห์คำแนะนำในการแก้ไขให้โดยอัตโนมัติค่ะ
+                        </p>
+                        <div id="hermes-analysis-box" style="background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.9rem; margin-bottom: 15px; white-space: pre-wrap; line-height: 1.5;">
+                            ยังไม่มีรายงานวิเคราะห์ฟีดแบ็กจาก Hermes กดปุ่มด้านล่างเพื่อทำการดึงและวิเคราะห์ผ่าน Ollama ครับ
+                        </div>
+                        <button class="btn btn-secondary" onclick="analyzeFeedbacks()">🔍 ให้ Hermes วิเคราะห์ฟีดแบ็กทั้งหมด</button>
+                    </div>
                 </div>
             </div>
         </div>
