@@ -282,7 +282,7 @@ def generate_ai_visuals():
         
         # Pollinations AI image url
         encoded = urllib.parse.quote(eng_prompt)
-        url = f"https://image.pollinations.ai/prompt/{encoded}"
+        url = f"https://image.pollinations.ai/p/{encoded}?width=1080&height=1920&nologo=true&private=true&safe=true"
         
         target_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
         print(f"Downloading AI Image for Scene {idx+1}: {url}")
