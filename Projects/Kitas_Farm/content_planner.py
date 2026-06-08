@@ -180,11 +180,20 @@ def write_reels_script(category, topic, fact_details):
 def clean_script_text(text: str) -> str:
     if not text:
         return ""
-    text = re.sub(r'[\u4e00-\u9fff]+', '', text)
+    
+    # Strip any Chinese characters (e.g. 保护) and foreign scripts
+    text = re.sub(r'[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+', '', text)
     text = re.sub(r'[\u0400-\u04FF]+', '', text)
+    
     text = text.replace("สวัสดีครับ/ครับกิ๊ก", "สวัสดีค่ะทุกคน")
     text = text.replace("สวัสดีครับกิ๊ก", "สวัสดีค่ะทุกคน")
     text = text.replace("ครับกิ๊ก", "ค่ะ")
+    
+    # Correct broken/truncated Thai terms
+    text = text.replace("ภูมิคุ้มก", "ภูมิคุ้มกัน")
+    text = text.replace("อัก체ระ", "อักเสบ")
+    text = text.replace("อักเสบระ", "อักเสบ")
+    text = text.replace("ป้องรัง", "ป้องกัน")
     
     # Replace wrong vegetables with correct salad greens grown at KITA FARM
     text = text.replace("ผักโบรกoli", "ผักกรีนโอ๊คและเรดโอ๊ค")
@@ -194,6 +203,7 @@ def clean_script_text(text: str) -> str:
     text = text.replace("ผักกาดขาว", "ผักกรีนคอส")
     text = text.replace("โบรกโคลี", "ผักสลัด")
     text = text.replace("กะหล่ำปลี", "ผักสลัดเรดโอ๊ค")
+    text = text.replace("ผักบุ้ง", "ผักสลัดเรดโอ๊ค")
     
     # Correct farming terminology
     text = text.replace("เกษตรอินทรีย์", "การปลูกไฮโดรโปนิกส์ปลอดสารเคมี")
@@ -205,6 +215,7 @@ def clean_script_text(text: str) -> str:
     text = text.replace("ไม่สนใจไม่ทาง", "น่าสนใจมากๆ เลยนะคะ")
     text = text.replace("เจ้าคะ", "เจ้า")
     text = text.replace("นะครับ", "นะคะ")
+    text = text.replace("ครับ", "ค่ะ")
     
     text = re.sub(r' +', ' ', text)
     text = re.sub(r'\n+', '\n', text)
@@ -220,6 +231,7 @@ def run_daily_loop():
     topic = random.choice(CATEGORIES[category])
     
     facts = fact_check_topic(category, topic)
+    facts = clean_script_text(facts)
     print(f"\nFact Check Summary:\n{facts}\n")
     
     brief_data = write_reels_script(category, topic, facts)
