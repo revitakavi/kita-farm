@@ -104,6 +104,16 @@ def generate_content():
     import subprocess
     python_exe = "C:\\Antigravity\\GEGE\\miniconda\\python.exe"
     script_path = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "content_planner.py")
+    
+    # Delete old daily_voice.mp3 if it exists so we start fresh for today's new content
+    old_voice = os.path.join(WORKSPACE_ROOT, "Raw", "Voice", "daily_voice.mp3")
+    if os.path.exists(old_voice):
+        try:
+            os.remove(old_voice)
+            print("Cleaned up old voice file during content generation.")
+        except Exception as e:
+            print(f"Failed to delete old voiceover: {e}")
+            
     try:
         subprocess.run([python_exe, script_path], check=True, cwd=WORKSPACE_ROOT)
         return get_today_content()
@@ -121,20 +131,16 @@ def approve_content():
         
     data["approved"] = True
     
-    # Generate the Thai gTTS audio track here during approval
-    from gtts import gTTS
-    audio_dir = os.path.join(WORKSPACE_ROOT, "Raw", "Voice")
-    os.makedirs(audio_dir, exist_ok=True)
-    audio_path = os.path.join(audio_dir, "daily_voice.mp3")
+    # We do not generate gTTS AI voiceover anymore, as Kik will record it manually.
+    data["voice_path"] = ""
     
-    try:
-        script_text = data.get("script", "")
-        clean_text = script_text.replace("\n", " ").replace("*", "").replace("-", "")
-        tts = gTTS(text=clean_text, lang='th')
-        tts.save(audio_path)
-        data["voice_path"] = audio_path
-    except Exception as e:
-        print(f"Failed to generate gTTS: {e}")
+    # Delete old daily_voice.mp3 if it exists so we start fresh for today
+    old_voice = os.path.join(WORKSPACE_ROOT, "Raw", "Voice", "daily_voice.mp3")
+    if os.path.exists(old_voice):
+        try:
+            os.remove(old_voice)
+        except Exception as e:
+            print(f"Failed to delete old voiceover: {e}")
     
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -220,10 +226,10 @@ def generate_ai_visuals():
     for idx, scene in enumerate(scenes[:3]):
         desc = scene.get("description", "")
         
-        # Translate description and topic using local nous-hermes model to get a high quality English prompt
+        # Translate description and topic using local gemma2:2b model to get a high quality English prompt
         translate_prompt = (
-            f"Translate this Thai description of a hydroponic farm scene into a descriptive English image generation prompt. "
-            f"Only output the translated English description, no introduction or other text.\n\n"
+            f"Translate the following Thai text describing a hydroponic salad farm scene into a short English description suitable for an image prompt. "
+            f"Output ONLY the raw English translation. Do NOT add notes, explanations, introduction, or quotes.\n\n"
             f"Thai text: \"{topic} - {desc}\""
         )
         
@@ -231,7 +237,7 @@ def generate_ai_visuals():
         try:
             ollama_url = "http://localhost:11434/api/generate"
             t_data = {
-                "model": "nous-hermes",
+                "model": "gemma2:2b",
                 "prompt": translate_prompt,
                 "stream": False
             }
@@ -242,7 +248,28 @@ def generate_ai_visuals():
             )
             with urllib.request.urlopen(req_t, timeout=30) as resp_t:
                 res_t = json.loads(resp_t.read().decode("utf-8"))
-                eng_description = res_t.get("response", "").strip()
+                raw_translation = res_t.get("response", "").strip()
+                
+                # Clean up conversational prefixes/thoughts
+                if "<thought>" in raw_translation:
+                    raw_translation = raw_translation.split("</thought>")[-1].strip()
+                
+                # Check for common conversational phrases and filter them out
+                lines = raw_translation.split("\n")
+                filtered_lines = []
+                for line in lines:
+                    line_lower = line.lower().strip()
+                    if not line_lower:
+                        continue
+                    if any(phrase in line_lower for phrase in [
+                        "sure, i can", "can you please", "here is the", "translation:",
+                        "translate this", "thai text", "translated english", "would you like"
+                    ]):
+                        continue
+                    filtered_lines.append(line.strip())
+                
+                eng_description = " ".join(filtered_lines).replace('"', '').replace("'", "").strip()
+                print(f"Translated Prompt for Scene {idx+1}: {eng_description}")
         except Exception as e:
             print(f"Translation failed: {e}")
             
@@ -259,6 +286,7 @@ def generate_ai_visuals():
         url = f"https://image.pollinations.ai/p/{encoded}?width=1080&height=1920&nologo=true&seed={seed}"
         
         target_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
+        print(f"Downloading AI Image for Scene {idx+1}: {url}")
         try:
             req = urllib.request.Request(
                 url,
@@ -266,20 +294,28 @@ def generate_ai_visuals():
             )
             with urllib.request.urlopen(req, timeout=30) as response, open(target_path, "wb") as out_file:
                 out_file.write(response.read())
-            downloaded += 1
+            
+            # Verify file size to check if it's a valid download and not a failed placeholder
+            if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
+                downloaded += 1
+                print(f"Successfully downloaded AI scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
         except Exception as e:
             print(f"Error downloading AI image {idx+1}: {e}")
             
     # If downloading failed, copy from fallback facebook images
-    if downloaded == 0:
+    if downloaded < 3:
+        print(f"Warning: Only {downloaded}/3 AI images downloaded successfully. Filling missing scenes from fallback.")
         fb_dir = os.path.join(WORKSPACE_ROOT, "Raw", "KitaFarm_Media", "facebook")
         import glob
         fb_images = glob.glob(os.path.join(fb_dir, "**", "*.jpg"), recursive=True)
-        if fb_images:
-            for idx in range(3):
-                src = random.choice(fb_images)
-                shutil.copy(src, os.path.join(ai_dir, f"scene_{idx+1}.jpg"))
-                downloaded += 1
+        for idx in range(3):
+            t_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
+            if not os.path.exists(t_path) or os.path.getsize(t_path) < 1000:
+                if fb_images:
+                    src = random.choice(fb_images)
+                    shutil.copy(src, t_path)
+                    downloaded += 1
+                    print(f"Copied fallback image to {t_path}")
 
     # Now render the video automatically
     import subprocess
