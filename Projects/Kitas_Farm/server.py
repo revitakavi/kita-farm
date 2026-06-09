@@ -42,6 +42,21 @@ FEEDBACK_ANALYSIS_FILE = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", 
 
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
+# Mount frontend files (HTML, CSS, JS) at root path
+app.mount("/static", StaticFiles(directory=WORKSPACE_ROOT), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+def read_root():
+    index_path = os.path.join(WORKSPACE_ROOT, "index.html")
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            # Dynamic path replacement so it links style.css and app.js through the static mount
+            content = content.replace('href="style.css"', 'href="/static/style.css"')
+            content = content.replace('src="app.js"', 'src="/static/app.js"')
+            return HTMLResponse(content=content, status_code=200)
+    return HTMLResponse(content="<h1>KITA FARM Dashboard Static Index.html not found!</h1>", status_code=404)
+
 class ChatMessage(BaseModel):
     sender: str
     message: str
