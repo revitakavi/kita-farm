@@ -203,7 +203,6 @@ def generate_ai_visuals():
     # Set visual mode to ai_generated
     data["visual_mode"] = "ai_generated"
     
-    # Save the file with updated visual_mode
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -213,7 +212,7 @@ def generate_ai_visuals():
     scenes = data.get("shooting_scenes", [])
     topic = data.get("topic", "Hydroponics salad greens")
     
-    # Clear old generated visuals if any
+    # Clear old generated visuals
     for f_name in os.listdir(ai_dir):
         if f_name.endswith(".jpg"):
             try:
@@ -221,140 +220,131 @@ def generate_ai_visuals():
             except:
                 pass
 
+    # Load local facebook tags db if it exists
+    tags_file = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "facebook_image_tags.json")
+    fb_dir = os.path.join(WORKSPACE_ROOT, "Raw", "KitaFarm_Media", "facebook", "KITA FARM - คีตะฟาร์ม", "KITA FARM - คีตะฟาร์ม's photos (pb.100067117794424.-2207520000)")
+    
+    tags_db = {}
+    if os.path.exists(tags_file):
+        try:
+            with open(tags_file, "r", encoding="utf-8") as f:
+                tags_db = json.load(f)
+        except Exception as e:
+            print(f"Error reading local tags database: {e}")
+
     downloaded = 0
-    # Map scenes or fallback
     for idx, scene in enumerate(scenes[:3]):
         desc = scene.get("description", "")
+        desc_lower = desc.lower()
+        topic_lower = topic.lower()
         
-        # Translate description and topic using local gemma2:2b model to get a high quality English prompt
-        translate_prompt = (
-            f"Translate the following Thai text describing a hydroponic salad farm scene into a short English description suitable for an image prompt. "
-            f"Output ONLY the raw English translation. Do NOT add notes, explanations, introduction, or quotes.\n\n"
-            f"Thai text: \"{topic} - {desc}\""
-        )
-        
-        eng_description = ""
-        try:
-            ollama_url = "http://localhost:11434/api/generate"
-            t_data = {
-                "model": "gemma2:2b",
-                "prompt": translate_prompt,
-                "stream": False
-            }
-            req_t = urllib.request.Request(
-                ollama_url,
-                data=json.dumps(t_data).encode("utf-8"),
-                headers={"Content-Type": "application/json"}
-            )
-            with urllib.request.urlopen(req_t, timeout=30) as resp_t:
-                res_t = json.loads(resp_t.read().decode("utf-8"))
-                raw_translation = res_t.get("response", "").strip()
-                
-                # Clean up conversational prefixes/thoughts
-                if "<thought>" in raw_translation:
-                    raw_translation = raw_translation.split("</thought>")[-1].strip()
-                
-                # Check for common conversational phrases and filter them out
-                lines = raw_translation.split("\n")
-                filtered_lines = []
-                for line in lines:
-                    line_lower = line.lower().strip()
-                    if not line_lower:
-                        continue
-                    if any(phrase in line_lower for phrase in [
-                        "sure, i can", "can you please", "here is the", "translation:",
-                        "translate this", "thai text", "translated english", "would you like"
-                    ]):
-                        continue
-                    filtered_lines.append(line.strip())
-                
-                eng_description = " ".join(filtered_lines).replace('"', '').replace("'", "").strip()
-                print(f"Translated Prompt for Scene {idx+1}: {eng_description}")
-        except Exception as e:
-            print(f"Translation failed: {e}")
-            
-        if not eng_description:
-            # Fallback simple prompt if translation fails
-            eng_description = f"Fresh green salad greens, hydroponic farm greenhouse in Chiang Mai Thailand, morning sun"
+        # 1. Determine keywords based on the scene and topic to search the local database
+        keywords = ["salad", "lettuce", "hydroponics"]
+        if "red" in topic_lower or "เรด" in topic_lower:
+            keywords.append("red oak")
+            keywords.append("red")
+        elif "butter" in topic_lower or "บัตเตอร์" in topic_lower:
+            keywords.append("butterhead")
+        elif "cos" in topic_lower or "คอส" in topic_lower:
+            keywords.append("cos")
+        elif "finlay" in topic_lower or "ฟินเล่" in topic_lower or "frillice" in topic_lower:
+            keywords.append("frillice")
 
-        # Create a detailed prompt in English
-        eng_prompt = f"Professional commercial food photography of {eng_description}. Vibrant hydroponic salad farm greenhouse in Chiang Mai, Thailand, bright morning sunlight, lush green fresh foliage, commercial food styling, depth of field, 9:16 vertical mobile aspect ratio, ultra high quality, clean crisp details"
-        
-        # Pollinations AI image url
-        encoded = urllib.parse.quote(eng_prompt)
-        url = f"https://image.pollinations.ai/p/{encoded}?width=1080&height=1920&nologo=true&private=true&safe=true"
+        if "greenhouse" in desc_lower or "โรงเรือน" in desc_lower:
+            keywords.append("greenhouse")
+            keywords.append("farm")
+        if "harvest" in desc_lower or "เก็บ" in desc_lower or "เด็ด" in desc_lower:
+            keywords.append("harvest")
+            keywords.append("farming activity")
+            keywords.append("packing")
         
         target_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
-        print(f"Downloading AI Image for Scene {idx+1}: {url}")
+        
+        # 2. Try to find a matching photo in local database first
+        matched_photo = None
+        if tags_db and os.path.exists(fb_dir):
+            matches = []
+            for filename, tags in tags_db.items():
+                score = 0
+                for kw in keywords:
+                    for tag in tags:
+                        if kw in tag.lower() or tag.lower() in kw:
+                            score += 1
+                if score > 0:
+                    full_p = os.path.join(fb_dir, filename)
+                    if os.path.exists(full_p):
+                        matches.append((score, full_p))
+            if matches:
+                # Sort by score descending
+                matches.sort(key=lambda x: x[0], reverse=True)
+                top_score = matches[0][0]
+                top_matches = [m[1] for m in matches if m[0] == top_score]
+                matched_photo = random.choice(top_matches)
+                
+        if matched_photo:
+            try:
+                shutil.copy(matched_photo, target_path)
+                downloaded += 1
+                print(f"Matched Scene {idx+1} to local image: {matched_photo} (Keywords: {keywords})")
+                continue
+            except Exception as e:
+                print(f"Failed to copy local matched image: {e}")
+
+        # 3. Fallback to LoremFlickr using a SINGLE keyword based on the scene context
+        # This prevents getting default cat/meme images from LoremFlickr when multiple tags fail
+        flickr_tag = "lettuce"
+        if "greenhouse" in keywords:
+            flickr_tag = "greenhouse"
+        elif "harvest" in keywords:
+            flickr_tag = "farming"
+        elif "red oak" in keywords:
+            flickr_tag = "red-lettuce"
+        elif "butterhead" in keywords:
+            flickr_tag = "lettuce"
+        elif "cos" in keywords:
+            flickr_tag = "lettuce"
+            
+        flickr_url = f"https://loremflickr.com/1080/1920/{flickr_tag}?lock={idx+1}"
+        print(f"Fallback to LoremFlickr for Scene {idx+1} using tag '{flickr_tag}': {flickr_url}")
+        
         try:
             req = urllib.request.Request(
-                url,
+                flickr_url,
                 headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
             )
-            with urllib.request.urlopen(req, timeout=20) as response, open(target_path, "wb") as out_file:
+            with urllib.request.urlopen(req, timeout=15) as response, open(target_path, "wb") as out_file:
                 out_file.write(response.read())
-            
-            # Verify file size to check if it's a valid download and not a failed placeholder/HTML page
-            if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
-                downloaded += 1
-                print(f"Successfully downloaded AI scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
-            else:
-                if os.path.exists(target_path):
-                    os.remove(target_path)
-                print(f"Downloaded file for Scene {idx+1} is too small or invalid. Removed.")
-        except Exception as e:
-            if os.path.exists(target_path):
-                try:
-                    os.remove(target_path)
-                except:
-                    pass
-            print(f"Error downloading AI image {idx+1}: {e}")
-            
-        # If Pollinations failed/timed-out, use LoremFlickr with category-specific keyword
-        if not os.path.exists(target_path) or os.path.getsize(target_path) < 1000:
-            print(f"Pollinations AI failed for Scene {idx+1}. Trying LoremFlickr fallback...")
-            tags = "hydroponics,salad,greenhouse"
-            topic_lower = topic.lower()
-            if "red" in topic_lower or "เรด" in topic_lower:
-                tags = "red,oak,salad,hydroponics"
-            elif "butter" in topic_lower or "บัตเตอร์" in topic_lower:
-                tags = "butterhead,salad,hydroponics"
-            elif "cos" in topic_lower or "คอส" in topic_lower:
-                tags = "cos,salad,hydroponics"
-            elif "finlay" in topic_lower or "ฟินเล่" in topic_lower:
-                tags = "frillice,salad,hydroponics"
                 
-            flickr_url = f"https://loremflickr.com/1080/1920/{tags}/all?lock={idx+1}"
-            try:
-                time.sleep(1.0) # Small sleep delay to prevent concurrent lockups/rate-limiting
-                req = urllib.request.Request(
-                    flickr_url,
-                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-                )
-                with urllib.request.urlopen(req, timeout=20) as response, open(target_path, "wb") as out_file:
-                    out_file.write(response.read())
-                if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
+            if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
+                # Ensure it's not the default cat placeholder (size 234114 bytes)
+                if os.path.getsize(target_path) == 234114:
+                    print(f"LoremFlickr returned the default cat image for Scene {idx+1}. Removing.")
+                    os.remove(target_path)
+                else:
                     downloaded += 1
                     print(f"Successfully downloaded LoremFlickr scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
-            except Exception as fe:
-                print(f"LoremFlickr download failed for Scene {idx+1}: {fe}")
-        
-        time.sleep(1.0) # Small sleep delay at end of loop iteration
+        except Exception as e:
+            print(f"LoremFlickr fallback failed: {e}")
+            if os.path.exists(target_path):
+                try: os.remove(target_path)
+                except: pass
 
-    # If both failed, copy from fallback facebook images as absolute last resort
-    if downloaded < 3:
-        print(f"Warning: Only {downloaded}/3 AI/Flickr images downloaded successfully. Filling missing scenes from facebook fallback.")
-        fb_dir = os.path.join(WORKSPACE_ROOT, "Raw", "KitaFarm_Media", "facebook")
-        import glob
-        fb_images = glob.glob(os.path.join(fb_dir, "**", "*.jpg"), recursive=True)
-        for idx in range(3):
-            t_path = os.path.join(ai_dir, f"scene_{idx+1}.jpg")
-            if not os.path.exists(t_path) or os.path.getsize(t_path) < 1000:
+        # 4. Ultimate fallback: Pick a random image from the facebook pool (even if no tags matched)
+        if not os.path.exists(target_path) or os.path.getsize(target_path) < 1000:
+            print(f"Final fallback: Copying random image from facebook pool for Scene {idx+1}")
+            if os.path.exists(fb_dir):
+                import glob
+                fb_images = glob.glob(os.path.join(fb_dir, "*.jpg"))
                 if fb_images:
                     src = random.choice(fb_images)
-                    shutil.copy(src, t_path)
-                    downloaded += 1
-                    print(f"Copied fallback facebook image to {t_path}")
+                    try:
+                        shutil.copy(src, target_path)
+                        downloaded += 1
+                        print(f"Copied random fallback image: {src}")
+                    except Exception as e:
+                        print(f"Failed to copy final fallback: {e}")
+        
+        time.sleep(0.5)
 
     # Now render the video automatically
     import subprocess
@@ -366,12 +356,12 @@ def generate_ai_visuals():
         # Log to chat
         post_chat(ChatMessage(
             sender="คุณกี้",
-            message=f"🤖 เจนภาพประกอบ AI สำเร็จ {downloaded} ซีน และทำการเรนเดอร์วิดีโอสตอรี่บอร์ดเสร็จสิ้นแล้วค่ะ สามารถตรวจสอบวิดีโอ Reels ประจำวันได้เลยนะคะ!"
+            message=f"🤖 สื่อสตอรี่บอร์ดจัดทำเสร็จแล้วค่ะ! เลือกภาพจากระบบ {downloaded} ซีน และทำการเรนเดอร์วิดีโอเรียบร้อยแล้วค่ะ สามารถตรวจสอบวิดีโอ Reels ได้ทันทีนะคะ!"
         ))
         
-        return {"status": "success", "message": f"เจนภาพ AI สำเร็จ {downloaded} ภาพ และเรนเดอร์วิดีโอเรียบร้อยแล้วค่ะ"}
+        return {"status": "success", "message": f"เตรียมภาพประกอบวิดีโอสำเร็จ {downloaded} ภาพ และเรนเดอร์วิดีโอเรียบร้อยแล้วค่ะ"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"ประกอบคลิปไม่สำเร็จหลังเจนภาพ: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"ประกอบคลิปไม่สำเร็จหลังจัดเตรียมภาพ: {str(e)}")
 
 @app.post("/api/feedback")
 def post_feedback(fb: FeedbackModel):
