@@ -294,11 +294,20 @@ def generate_ai_visuals():
             with urllib.request.urlopen(req, timeout=20) as response, open(target_path, "wb") as out_file:
                 out_file.write(response.read())
             
-            # Verify file size to check if it's a valid download and not a failed placeholder
+            # Verify file size to check if it's a valid download and not a failed placeholder/HTML page
             if os.path.exists(target_path) and os.path.getsize(target_path) > 1000:
                 downloaded += 1
                 print(f"Successfully downloaded AI scene_{idx+1}.jpg, size: {os.path.getsize(target_path)}")
+            else:
+                if os.path.exists(target_path):
+                    os.remove(target_path)
+                print(f"Downloaded file for Scene {idx+1} is too small or invalid. Removed.")
         except Exception as e:
+            if os.path.exists(target_path):
+                try:
+                    os.remove(target_path)
+                except:
+                    pass
             print(f"Error downloading AI image {idx+1}: {e}")
             
         # If Pollinations failed/timed-out, use LoremFlickr with category-specific keyword
