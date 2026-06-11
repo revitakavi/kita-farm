@@ -162,6 +162,34 @@ def approve_content():
         
     return {"status": "approved", "data": data}
 
+class AntigravityTriggerModel(BaseModel):
+    prompt: str
+    context_data: dict = {}
+
+@app.post("/api/content/trigger-antigravity")
+def trigger_antigravity(payload: AntigravityTriggerModel):
+    trigger_file = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "antigravity_trigger.json")
+    
+    trigger_data = {
+        "timestamp": time.time(),
+        "status": "pending",
+        "prompt": payload.prompt,
+        "context_data": payload.context_data
+    }
+    
+    # Write the task file so Antigravity AI can read it in the next agent turn
+    with open(trigger_file, "w", encoding="utf-8") as f:
+        json.dump(trigger_data, f, ensure_ascii=False, indent=2)
+        
+    # Log notification to chat so users see it immediately
+    post_chat(ChatMessage(
+        sender="ระบบคีตะฟาร์ม",
+        message=f"🔔 [คำขอส่งถึงคุณกี้ AI] หัวข้อ: \"{payload.prompt}\" ถูกบันทึกเข้าสู่คิวคอมพิวเตอร์หลักแล้วค่ะ กรุณาทักคุณกี้ในแชตเพื่อดำเนินงานต่อค่ะ"
+    ))
+    
+    return {"status": "success", "message": "ส่งคำขอถึงคุณกี้สำเร็จแล้ว! ทักคุณกี้ในหน้าต่างแชต AI เพื่อให้กี้ประมวลผลด่วนได้เลยค่ะ"}
+
+
 @app.post("/api/upload")
 def upload_media(file: UploadFile = File(...), sender: str = Form("กิ๊ก (พนักงานฟาร์ม)")):
     # Check if the uploaded file is an audio file (Kik's voiceover recording)
@@ -189,6 +217,17 @@ def upload_media(file: UploadFile = File(...), sender: str = Form("กิ๊ก 
                 sender=sender,
                 message=f"📤 อัปโหลดรูปภาพแปลงผักใหม่สำเร็จ: {file.filename} (สามารถนำไปประกอบคลิปได้เลยค่ะ)"
             ))
+            # Automatically set visual_mode to farm_footage
+            meta_path = os.path.join(WORKSPACE_ROOT, "Projects", "Kitas_Farm", "today_content.json")
+            if os.path.exists(meta_path):
+                try:
+                    with open(meta_path, "r", encoding="utf-8") as f_meta:
+                        data = json.load(f_meta)
+                    data["visual_mode"] = "farm_footage"
+                    with open(meta_path, "w", encoding="utf-8") as f_meta:
+                        json.dump(data, f_meta, ensure_ascii=False, indent=2)
+                except Exception as e:
+                    print(f"Failed to update visual_mode: {e}")
         
         return {"filename": file.filename, "status": "success", "sender": sender, "is_audio": is_audio}
     except Exception as e:

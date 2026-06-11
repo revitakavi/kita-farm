@@ -474,6 +474,34 @@ function generateDailyContent() {
         });
 }
 
+// Trigger Antigravity Cloud AI task
+function triggerAntigravityPrompt() {
+    const customPrompt = prompt("ระบุหัวข้อคอนเทนต์ หรือคำสั่งที่ต้องการให้คุณกี้ (Antigravity Cloud AI) ช่วยคิดและร่างสคริปต์ให้โดยตรงค่ะ:", "เคล็ดลับการคุมค่า EC ของเรดโอ๊คไม่ให้เกิน 1.4");
+    if (!customPrompt) return;
+
+    const scriptDiv = document.getElementById("reels-script");
+    const factCheckDiv = document.getElementById("fact-check-box");
+    const scenesContainer = document.getElementById("reels-scenes-container");
+
+    scriptDiv.innerText = "⏳ บันทึกคำขอเข้าระบบสำเร็จแล้วค่ะ! กรุณาทักคุณกี้ในหน้าต่างแชต AI เพื่อให้คุณกี้ (Antigravity Cloud) ดำเนินการเจนสคริปต์ความรู้และฉากแบบด่วนให้ค่ะ...";
+    scenesContainer.innerHTML = "";
+    document.getElementById("daily-script-container").style.display = "block";
+    factCheckDiv.innerHTML = `<h4 style="color: var(--secondary-color); margin-bottom: 10px;">📋 รอการประมวลผล RAG จาก Cloud...</h4><p style="color: var(--text-secondary);">ทักคุณกี้ในแชตเพื่อดำเนินงานต่อได้เลยค่ะ</p>`;
+
+    fetch(`${API_BASE}/content/trigger-antigravity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: customPrompt, context_data: { "category": "GEGE_KNOWLEDGE" } })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(err => {
+        alert("ส่งคำขอล้มเหลว: " + err.message);
+    });
+}
+
 // Approve script
 function approveDailyContent() {
     fetch(`${API_BASE}/content/approve`, { method: "POST" })

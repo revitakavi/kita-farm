@@ -101,8 +101,10 @@
                         กี้ทำหน้าที่วิเคราะห์ข้อมูลสต็อกผักร่วมกับพี่กร วิจัยความรู้จริงเรื่องผักไฮโดรโปนิกส์ และวางสคริปต์สั้นพร้อมใบสั่งงานถ่ายทำ (Shooting Brief) เพื่อให้น้องกิ๊กนำไปผลิตจริงได้ทันรอบค่ะ
                     </p>
                     
-                    <button class="btn" onclick="generateDailyContent()">🤖 สุ่มและผลิตสคริปต์วันนี้</button>
-                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn" onclick="generateDailyContent()">🤖 สุ่มและผลิตสคริปต์ (LLM ในเครื่อง)</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white;" onclick="triggerAntigravityPrompt()">⚡ ส่งสคริปต์ให้คุณกี้ (Antigravity Cloud AI)</button>
+                    </div>                    
                     <div id="daily-script-container" style="margin-top: 25px; display: none;">
                         <h4 style="color: var(--primary-color); margin-bottom: 10px;">📋 สคริปต์พากย์ของกี้ประจำวัน:</h4>
                         <div id="reels-script" style="background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); white-space: pre-wrap; font-size: 0.95rem; margin-bottom: 15px;"></div>
